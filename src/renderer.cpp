@@ -11,7 +11,6 @@ int MCRFT::Renderer::init()
     m_camera->init_camera(m_screen->m_window);
     setup_shaders();
 
-    unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 

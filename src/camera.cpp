@@ -43,7 +43,7 @@ void MCRFT::Camera::update_shaders_projection_mat(Shader *shader)
     shader->setMat4("projection", projection);
 
     // camera/view transformation
-    glm::mat4 view = glm::lookAt(m_camera_pos, m_camera_pos + m_camera_front, m_camera_front);
+    glm::mat4 view = glm::lookAt(m_camera_pos, m_camera_pos + m_camera_front, m_camera_up);
     shader->setMat4("view", view);
 }
 
