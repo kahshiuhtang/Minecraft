@@ -6,6 +6,12 @@ cmake_policy(SET CMP0072 NEW)
 
 find_package(OpenGL REQUIRED)
 
+include_directories(${BULLET_INCLUDE_DIR})
+find_package(Bullet CONFIG REQUIRED)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON) 
+set(BULLET_PHYSICS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+
 include_directories(include)
 
 include(FetchContent)
@@ -27,6 +33,9 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(assimp)
 
+add_library(compiler_flags INTERFACE)
+target_compile_features(compiler_flags INTERFACE cxx_std_17)
+
 add_executable(minecraft 
                 src/main.cpp
                 src/glad.c 
@@ -38,14 +47,15 @@ add_executable(minecraft
                 include/renderer.hpp
                 include/screen.hpp
                 include/shader.hpp
-
                 )
 
 target_include_directories(minecraft PRIVATE include)
-
+target_compile_definitions(minecraft PUBLIC ${BULLET_DEFINITIONS})
+target_link_directories(minecraft PUBLIC ${Bullet_DIR}/${BULLET_ROOT_DIR}/${BULLET_LIBRARY_DIRS})
 target_link_libraries(minecraft 
                         glfw
                         OpenGL::GL
+                        glm::glm
+                        assimp::assimp
                         )
-target_link_libraries(minecraft glm::glm
-                                assimp::assimp)
+target_link_libraries(minecraft BulletDynamics BulletCollision LinearMath)
