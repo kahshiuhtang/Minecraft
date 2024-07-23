@@ -1,7 +1,8 @@
 #include "renderer.hpp"
+#include "world.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <external/stb_image.h>
 
 int MCRFT::Renderer::init()
 {
@@ -76,6 +77,7 @@ int MCRFT::Renderer::init()
 int MCRFT::Renderer::setup_shaders()
 {
     m_shader = new Shader("../rsrc/7.3.camera.vs", "../rsrc/7.3.camera.fs");
+    // m_shader = new Shader("../rsrc/model_loading.vs", "../rsrc/model_loading.fs");
     return 0;
 }
 int MCRFT::Renderer::init_textures()
@@ -131,22 +133,29 @@ int MCRFT::Renderer::init_textures()
 }
 int MCRFT::Renderer::loop()
 {
-    glm::vec3 cube_positions[] = {
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(5.0f, 5.0f, -15.0f),
-        glm::vec3(5.0f, 6.0f, -15.0f),
-        glm::vec3(5.0f, 7.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(5.0f, 5.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(5.0f, 5.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(5.0f, 5.0f, 0.0f),
-    };
     // render loop
     // -----------
+    const siv::PerlinNoise::seed_type seed = 123456u;
+
+    const siv::PerlinNoise perlin{seed};
+    double prevTime = 0.0;
+    double crntTime = 0.0;
+    double timeDiff;
+    unsigned int counter = 0;
     while (!glfwWindowShouldClose(m_screen->m_window))
     {
+        crntTime = glfwGetTime();
+        timeDiff = crntTime - prevTime;
+        counter++;
+        // If a second has passed.
+        if (timeDiff >= 1.0 / 30.0)
+        {
+            std::string FPS = std::to_string((1.0 / timeDiff) * counter);
+            std::string new_title = FPS + " FPS";
+            glfwSetWindowTitle(m_screen->m_window, new_title.c_str());
+            prevTime = crntTime;
+            counter = 0;
+        }
         m_camera->update_frame();
 
         // input
@@ -170,13 +179,22 @@ int MCRFT::Renderer::loop()
 
         // render boxes
         glBindVertexArray(VAO);
-        for (unsigned int i = 0; i < 10; i++)
+        for (unsigned int i = 0; i <= 100; i++)
         {
-            // calculate the model matrix for each object and pass it to shader before drawing
-            glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-            model = glm::translate(model, cube_positions[i]);
-            m_shader->setMat4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            for (unsigned int j = 0; j <= 100; j++)
+            {
+                double noise = perlin.octave2D_01((i * 0.01), (j * 0.01), 4);
+                noise *= 100;
+                const int i_noise = static_cast<int>(noise);
+                for (unsigned int k = 0; k < i_noise; k++)
+                {
+                    glm::vec3 position = glm::vec3(i * 1.0f, k * 1.0f, j * 1.0f);
+                    glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+                    model = glm::translate(model, position);
+                    m_shader->setMat4("model", model);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

@@ -46,6 +46,7 @@ int MCRFT::Screen::init_window()
 int MCRFT::Screen::init_callbacks()
 {
     glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
+    return 0;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
