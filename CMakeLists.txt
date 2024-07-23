@@ -43,10 +43,14 @@ add_executable(minecraft
                 src/renderer.cpp
                 src/shader.cpp
                 src/screen.cpp
+                src/player.cpp
+                src/world.cpp
                 include/camera.hpp
                 include/renderer.hpp
                 include/screen.hpp
                 include/shader.hpp
+                include/player.hpp
+                include/world.hpp
                 )
 
 target_include_directories(minecraft PRIVATE include)
