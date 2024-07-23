@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "player.hpp"
 #include "shader.hpp"
 
 namespace MCRFT
@@ -26,20 +27,23 @@ namespace MCRFT
         void update_shaders_projection_mat(Shader *m_shader);
 
         // timing
-        float m_delta_time = 0.0f; // time between current frame and last frame
-        float m_last_frame = 0.0f;
+        float m_delta_time; // time between current frame and last frame
+        float m_last_frame;
 
         // camera
-        glm::vec3 m_camera_pos = glm::vec3(0.0f, 0.0f, 3.0f);
-        glm::vec3 m_camera_front = glm::vec3(0.0f, 0.0f, -1.0f);
-        glm::vec3 m_camera_up = glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::vec3 m_camera_pos;
+        glm::vec3 m_camera_front;
+        glm::vec3 m_camera_up;
 
-        bool m_first_mouse = true;
-        float m_yaw = -90.0f; // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-        float m_pitch = 0.0f;
-        float m_last_x = 800.0f / 2.0;
-        float m_last_y = 600.0 / 2.0;
-        float m_fov = 45.0f;
+        // player
+        Player *m_curr_player;
+
+        bool m_first_mouse;
+        float m_yaw; // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+        float m_pitch;
+        float m_last_x;
+        float m_last_y;
+        float m_fov;
     };
 }
 #endif

@@ -9,10 +9,6 @@
 #include <sstream>
 #include <iostream>
 
-namespace MCRFT
-{
-
-}
 class Shader
 {
 public:

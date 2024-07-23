@@ -17,7 +17,6 @@ namespace MCRFT
         int init_window();
         int init_callbacks();
 
-        int finish_init();
         GLFWwindow *m_window;
 
     private:
