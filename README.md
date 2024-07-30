@@ -33,6 +33,8 @@ cmake --build /home/kahshiuh/Documents/projects/Minecraft/build --config Debug -
 
 [X] Render blocks
 [X] Use mouse and keyboard to pan around and move.
-[] Generate the world automatically
-[] Create a world object that keeps track of chunks
+[X] Generate the world automatically
+[X] Create a world object that keeps track of chunks
 [] Figure out how to keep track of position
+[] Render a mesh instead of block by block
+[] Stop phasing through blocks

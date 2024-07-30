@@ -16,6 +16,10 @@ int MCRFT::Renderer::init()
     glGenBuffers(1, &VBO);
 
     glBindVertexArray(VAO);
+    /*
+    Want position, texture, world_position
+    Uniform
+    */
     float vertices[] = {
         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
         0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
@@ -144,6 +148,7 @@ int MCRFT::Renderer::loop()
     unsigned int counter = 0;
     World *world = new World();
     world->init();
+    world->generate_all_chunk_meshes();
     while (!glfwWindowShouldClose(m_screen->m_window))
     {
         crntTime = glfwGetTime();
@@ -181,11 +186,11 @@ int MCRFT::Renderer::loop()
 
         // render boxes
         glBindVertexArray(VAO);
-        for (unsigned int i = 0; i <= 100; i++)
+        for (unsigned int i = 0; i <= 50; i++)
         {
             for (unsigned int j = 0; j <= 100; j++)
             {
-                for (unsigned int k = 0; k <= 100; k++)
+                for (unsigned int k = 0; k <= 50; k++)
                 {
                     if (world->is_block_occupied(i, j, k) == false)
                     {

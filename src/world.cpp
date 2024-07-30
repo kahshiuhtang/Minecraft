@@ -1,5 +1,8 @@
 #include "world.hpp"
 #include "iostream"
+
+void AddFace(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction);
+
 void MCRFT::World::init()
 {
     try
@@ -20,7 +23,7 @@ void MCRFT::World::init()
     }
     catch (const std::exception &e)
     {
-        std::cout << "Caught an exception: " << e.what() << std::endl;
+        std::cout << "World init(): Exception: " << e.what() << std::endl;
     }
 }
 
@@ -36,6 +39,14 @@ bool MCRFT::World::is_block_occupied(int x, int y, int z)
     unsigned int coord_y_within_chunk = y % 16;
     unsigned int chunk_z = z / 16;
     unsigned int coord_z_within_chunk = z % 16;
+    if (chunk_x >= 16 || chunk_x < 0)
+    {
+        return false;
+    }
+    if (chunk_z >= 16 || chunk_z < 0)
+    {
+        return false;
+    }
     Chunk *curr_chunk = m_chunks[chunk_x][chunk_z];
     if (curr_chunk == nullptr || curr_chunk->m_sections == nullptr)
     {
@@ -60,7 +71,7 @@ bool MCRFT::World::is_block_occupied(int x, int y, int z)
     }
     return !(curr_section->blocks[coord_x_within_chunk][coord_y_within_chunk][coord_z_within_chunk] == nullptr);
 }
-void MCRFT::Chunk::initialize_chunk(const siv::PerlinNoise *perlin, unsigned int chunk_x, unsigned int chunk_y, const int chunk_size_x, const int chunk_size_y)
+void MCRFT::Chunk::initialize_chunk(const siv::PerlinNoise *perlin, unsigned int chunk_x, unsigned int chunk_z, const int chunk_size_x, const int chunk_size_z)
 {
     try
     {
@@ -70,18 +81,19 @@ void MCRFT::Chunk::initialize_chunk(const siv::PerlinNoise *perlin, unsigned int
             ChunkSection *new_section = new ChunkSection();
             m_sections[i] = new_section;
         }
-        int block_heights[16][16];
+        m_chunk_x = chunk_x;
+        m_chunk_z = chunk_z;
         const unsigned int starting_x_coord = chunk_x * chunk_size_x;
-        const unsigned int starting_y_coord = chunk_y * chunk_size_y;
+        const unsigned int starting_z_coord = chunk_z * chunk_size_z;
         // for every x, z (16 x 16), we want to get the height at THAT specific x, z
         for (unsigned int i = 0; i < chunk_size_x; i++)
         {
-            for (unsigned int j = 0; j < chunk_size_y; j++)
+            for (unsigned int j = 0; j < chunk_size_z; j++)
             {
-                double noise = perlin->octave2D_01(((starting_x_coord + i) * 0.01), ((starting_y_coord + j) * 0.01), 4);
+                double noise = perlin->octave2D_01(((starting_x_coord + i) * 0.01), ((starting_z_coord + j) * 0.01), 4);
                 noise *= 100;
                 const int coordinate_height = static_cast<int>(noise);
-                block_heights[i][j] = coordinate_height;
+                m_max_height[i][j] = coordinate_height;
             }
         }
         for (unsigned int i = 0; i < sizeof(m_sections) / sizeof(m_sections[0]); i++)
@@ -94,7 +106,7 @@ void MCRFT::Chunk::initialize_chunk(const siv::PerlinNoise *perlin, unsigned int
                 {
                     for (unsigned int w = 0; w < 16; w++) // z
                     {
-                        if (min_height + v <= block_heights[u][w])
+                        if (min_height + v <= m_max_height[u][w])
                         {
                             current_section->blocks[u][v][w] = new Block();
                         }
@@ -109,6 +121,152 @@ void MCRFT::Chunk::initialize_chunk(const siv::PerlinNoise *perlin, unsigned int
     }
     catch (const std::exception &e)
     {
-        std::cout << "Caught an exception: " << e.what() << std::endl;
+        std::cout << "World initialize_chunk(): Exception: " << e.what() << std::endl;
+    }
+}
+bool MCRFT::World::generate_all_chunk_meshes()
+{
+    bool err = false;
+    try
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            for (int j = 0; j < 16; j++)
+            {
+                m_chunks[i][j]->generate_mesh(this);
+            }
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << "World generate_all_chunk_meshes(): Exception: " << e.what() << std::endl;
+    }
+    return err;
+}
+void MCRFT::Chunk::generate_mesh(MCRFT::World *world)
+{
+    try
+    {
+        if (world == nullptr)
+        {
+            std::cout << "Chunk generate_mesh(): world is a nullptr" << std::endl;
+            return;
+        }
+        m_mesh_vertices.clear();
+        for (unsigned int i = 0; i < 16; i++)
+        {
+            for (unsigned int j = 0; j < 16; j++)
+            {
+                int y_coord = m_max_height[i][j];
+                int x_coord = m_chunk_x * 16 + i;
+                int z_coord = m_chunk_z * 16 + j;
+                if (world->is_block_occupied(x_coord + 1, y_coord, z_coord) == false)
+                {
+                    AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::LEFT);
+                }
+                if (world->is_block_occupied(x_coord - 1, y_coord, z_coord) == false)
+                {
+                    AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::RIGHT);
+                }
+                if (world->is_block_occupied(x_coord, y_coord + 1, z_coord) == false)
+                {
+                    AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::TOP);
+                }
+                if (world->is_block_occupied(x_coord, y_coord - 1, z_coord) == false)
+                {
+                    AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::BOTTOM);
+                }
+                if (world->is_block_occupied(x_coord, y_coord, z_coord + 1) == false)
+                {
+                    AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::BACK);
+                }
+                if (world->is_block_occupied(x_coord, y_coord, z_coord - 1) == false)
+                {
+                    AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::FRONT);
+                }
+            }
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << "Chunk generate_mesh(): Exception: " << e.what() << std::endl;
+    }
+}
+void AddFace(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction)
+{
+    float VOXEL_VERTICES[] = {
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f};
+    int index = 0;
+    switch (direction)
+    {
+    case MCRFT::Direction::TOP:
+        index = 30 * 6;
+        break;
+    case MCRFT::Direction::BOTTOM:
+        index = 24 * 6;
+        break;
+    case MCRFT::Direction::LEFT:
+        index = 18 * 6;
+        break;
+    case MCRFT::Direction::RIGHT:
+        index = 12 * 6;
+        break;
+    case MCRFT::Direction::FRONT:
+        index = 0 * 6;
+        break;
+    case MCRFT::Direction::BACK:
+        index = 6 * 6;
+        break;
+    }
+    for (unsigned int i = 0; i < 6; i++)
+    {
+        for (unsigned int j = 0; j < 6; j++)
+        {
+            vertices->push_back(VOXEL_VERTICES[index]);
+            index += 1;
+        }
+        vertices->push_back(x);
+        vertices->push_back(y);
+        vertices->push_back(z);
     }
 }
