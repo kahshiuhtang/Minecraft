@@ -142,6 +142,8 @@ int MCRFT::Renderer::loop()
     double crntTime = 0.0;
     double timeDiff;
     unsigned int counter = 0;
+    World *world = new World();
+    world->init();
     while (!glfwWindowShouldClose(m_screen->m_window))
     {
         crntTime = glfwGetTime();
@@ -183,17 +185,55 @@ int MCRFT::Renderer::loop()
         {
             for (unsigned int j = 0; j <= 100; j++)
             {
-                double noise = perlin.octave2D_01((i * 0.01), (j * 0.01), 4);
-                noise *= 100;
-                const int i_noise = static_cast<int>(noise);
-                for (unsigned int k = 0; k < i_noise; k++)
+                for (unsigned int k = 0; k <= 100; k++)
                 {
-                    glm::vec3 position = glm::vec3(i * 1.0f, k * 1.0f, j * 1.0f);
+                    if (world->is_block_occupied(i, j, k) == false)
+                    {
+                        continue;
+                    }
+                    glm::vec3 position = glm::vec3(i * 1.0f, j * 1.0f, k * 1.0f);
                     glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
                     model = glm::translate(model, position);
                     m_shader->setMat4("model", model);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                    if (!world->is_block_occupied(i + 1, j, k))
+                    {
+                        glDrawArrays(GL_TRIANGLES, 18, 6);
+                    }
+                    if (!world->is_block_occupied(i - 1, j, k))
+                    {
+                        glDrawArrays(GL_TRIANGLES, 12, 6);
+                    }
+                    if (!world->is_block_occupied(i, j + 1, k))
+                    {
+                        glDrawArrays(GL_TRIANGLES, 30, 6);
+                    }
+                    if (!world->is_block_occupied(i, j - 1, k))
+                    {
+                        glDrawArrays(GL_TRIANGLES, 24, 6);
+                    }
+                    if (!world->is_block_occupied(i, j, k + 1))
+                    {
+                        glDrawArrays(GL_TRIANGLES, 6, 6);
+                    }
+                    if (!world->is_block_occupied(i, j, k - 1))
+                    {
+                        glDrawArrays(GL_TRIANGLES, 0, 6);
+                    }
                 }
+                // double noise = perlin.octave2D_01((i * 0.01), (j * 0.01), 4);
+                // noise *= 100;
+                // const int i_noise = static_cast<int>(noise);
+                // for (unsigned int k = 0; k < i_noise; k++)
+                // {
+                //     glm::vec3 position = glm::vec3(i * 1.0f, k * 1.0f, j * 1.0f);
+                //     glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+                //     model = glm::translate(model, position);
+                //     m_shader->setMat4("model", model);
+                //     glDrawArrays(GL_TRIANGLES, 6, 6);
+                //     glDrawArrays(GL_TRIANGLES, 12, 6);
+                //     glDrawArrays(GL_TRIANGLES, 18, 6);
+                //     glDrawArrays(GL_TRIANGLES, 24, 6);
+                // }
             }
         }
 
