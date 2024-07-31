@@ -25,8 +25,8 @@ namespace MCRFT
         Shader *m_shader;
         Camera *m_camera;
         Screen *m_screen;
-        unsigned int VBO;
-        unsigned int VAO;
+        unsigned int p_VBO;
+        unsigned int p_VAO;
         // load and create a texture
         // -------------------------
         unsigned int texture1;

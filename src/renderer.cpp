@@ -11,67 +11,6 @@ int MCRFT::Renderer::init()
     m_camera = new Camera();
     m_camera->init_camera(m_screen->m_window);
     setup_shaders();
-
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-
-    glBindVertexArray(VAO);
-    /*
-    Want position, texture, world_position
-    Uniform
-    */
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f};
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
     init_textures();
     m_shader->use();
     m_shader->setInt("texture1", 0);
@@ -140,7 +79,6 @@ int MCRFT::Renderer::loop()
     // render loop
     // -----------
     const siv::PerlinNoise::seed_type seed = 123456u;
-
     const siv::PerlinNoise perlin{seed};
     double prevTime = 0.0;
     double crntTime = 0.0;
@@ -149,6 +87,8 @@ int MCRFT::Renderer::loop()
     World *world = new World();
     world->init();
     world->generate_all_chunk_meshes();
+    glGenVertexArrays(1, &p_VAO);
+    glGenBuffers(1, &p_VBO);
     while (!glfwWindowShouldClose(m_screen->m_window))
     {
         crntTime = glfwGetTime();
@@ -183,62 +123,38 @@ int MCRFT::Renderer::loop()
         // activate shader
         m_shader->use();
         m_camera->update_shaders_projection_mat(m_shader);
-
         // render boxes
-        glBindVertexArray(VAO);
-        for (unsigned int i = 0; i <= 50; i++)
+        glBindVertexArray(p_VAO);
+        for (unsigned int i = 0; i < 16; i++)
         {
-            for (unsigned int j = 0; j <= 100; j++)
+            for (unsigned int j = 0; j < 16; j++)
             {
-                for (unsigned int k = 0; k <= 50; k++)
+
+                glBindVertexArray(p_VAO);
+                /*
+                Want position, texture, world_position
+                Uniform
+                */
+                Chunk *chunk = world->get_chunk(i, j);
+                if (chunk == nullptr)
                 {
-                    if (world->is_block_occupied(i, j, k) == false)
-                    {
-                        continue;
-                    }
-                    glm::vec3 position = glm::vec3(i * 1.0f, j * 1.0f, k * 1.0f);
-                    glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-                    model = glm::translate(model, position);
-                    m_shader->setMat4("model", model);
-                    if (!world->is_block_occupied(i + 1, j, k))
-                    {
-                        glDrawArrays(GL_TRIANGLES, 18, 6);
-                    }
-                    if (!world->is_block_occupied(i - 1, j, k))
-                    {
-                        glDrawArrays(GL_TRIANGLES, 12, 6);
-                    }
-                    if (!world->is_block_occupied(i, j + 1, k))
-                    {
-                        glDrawArrays(GL_TRIANGLES, 30, 6);
-                    }
-                    if (!world->is_block_occupied(i, j - 1, k))
-                    {
-                        glDrawArrays(GL_TRIANGLES, 24, 6);
-                    }
-                    if (!world->is_block_occupied(i, j, k + 1))
-                    {
-                        glDrawArrays(GL_TRIANGLES, 6, 6);
-                    }
-                    if (!world->is_block_occupied(i, j, k - 1))
-                    {
-                        glDrawArrays(GL_TRIANGLES, 0, 6);
-                    }
+                    continue;
                 }
-                // double noise = perlin.octave2D_01((i * 0.01), (j * 0.01), 4);
-                // noise *= 100;
-                // const int i_noise = static_cast<int>(noise);
-                // for (unsigned int k = 0; k < i_noise; k++)
-                // {
-                //     glm::vec3 position = glm::vec3(i * 1.0f, k * 1.0f, j * 1.0f);
-                //     glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-                //     model = glm::translate(model, position);
-                //     m_shader->setMat4("model", model);
-                //     glDrawArrays(GL_TRIANGLES, 6, 6);
-                //     glDrawArrays(GL_TRIANGLES, 12, 6);
-                //     glDrawArrays(GL_TRIANGLES, 18, 6);
-                //     glDrawArrays(GL_TRIANGLES, 24, 6);
-                // }
+                std::vector<float> *vertices = &(chunk->m_mesh_vertices);
+                glm::mat4 model = glm::mat4(1.0f);
+                m_shader->setMat4("model", model);
+                glBindBuffer(GL_ARRAY_BUFFER, p_VBO);
+                glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(float), vertices->data(), GL_STATIC_DRAW);
+
+                // position attribute
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+                glEnableVertexAttribArray(0);
+                // texture coord attribute
+                glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+                glEnableVertexAttribArray(1);
+                glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(5 * sizeof(float)));
+                glEnableVertexAttribArray(2);
+                glDrawArrays(GL_TRIANGLES, 0, vertices->size() / 8);
             }
         }
 
@@ -253,8 +169,8 @@ int MCRFT::Renderer::destroy_renderer()
 {
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &p_VAO);
+    glDeleteBuffers(1, &p_VBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------

@@ -45,6 +45,7 @@ namespace MCRFT
         void init();
         bool is_block_occupied(int x, int y, int z);
         bool generate_all_chunk_meshes();
+        Chunk *get_chunk(int x, int z);
 
     private:
         const int CHUNK_SIZE_X = 16;

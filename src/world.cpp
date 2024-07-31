@@ -240,27 +240,27 @@ void AddFace(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction
     switch (direction)
     {
     case MCRFT::Direction::TOP:
-        index = 30 * 6;
+        index = 30 * 5;
         break;
     case MCRFT::Direction::BOTTOM:
-        index = 24 * 6;
+        index = 24 * 5;
         break;
     case MCRFT::Direction::LEFT:
-        index = 18 * 6;
+        index = 18 * 5;
         break;
     case MCRFT::Direction::RIGHT:
-        index = 12 * 6;
+        index = 12 * 5;
         break;
     case MCRFT::Direction::FRONT:
-        index = 0 * 6;
+        index = 0 * 5;
         break;
     case MCRFT::Direction::BACK:
-        index = 6 * 6;
+        index = 6 * 5;
         break;
     }
     for (unsigned int i = 0; i < 6; i++)
     {
-        for (unsigned int j = 0; j < 6; j++)
+        for (unsigned int j = 0; j < 5; j++)
         {
             vertices->push_back(VOXEL_VERTICES[index]);
             index += 1;
@@ -268,5 +268,24 @@ void AddFace(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction
         vertices->push_back(x);
         vertices->push_back(y);
         vertices->push_back(z);
+    }
+}
+MCRFT::Chunk *MCRFT::World::get_chunk(int x, int z)
+{
+    try
+    {
+        if (x < 0 || x >= 16)
+        {
+            return nullptr;
+        }
+        if (z < 0 || z >= 16)
+        {
+            return nullptr;
+        }
+        return m_chunks[x][z];
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << "Chunk generate_mesh(): Exception: " << e.what() << std::endl;
     }
 }
