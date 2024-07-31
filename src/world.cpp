@@ -157,32 +157,36 @@ void MCRFT::Chunk::generate_mesh(MCRFT::World *world)
         {
             for (unsigned int j = 0; j < 16; j++)
             {
-                int y_coord = m_max_height[i][j];
-                int x_coord = m_chunk_x * 16 + i;
-                int z_coord = m_chunk_z * 16 + j;
-                if (world->is_block_occupied(x_coord + 1, y_coord, z_coord) == false)
+                int max_height = m_max_height[i][j];
+                for (int k = 0; k <= max_height; k++)
                 {
-                    AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::LEFT);
-                }
-                if (world->is_block_occupied(x_coord - 1, y_coord, z_coord) == false)
-                {
-                    AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::RIGHT);
-                }
-                if (world->is_block_occupied(x_coord, y_coord + 1, z_coord) == false)
-                {
-                    AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::TOP);
-                }
-                if (world->is_block_occupied(x_coord, y_coord - 1, z_coord) == false)
-                {
-                    AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::BOTTOM);
-                }
-                if (world->is_block_occupied(x_coord, y_coord, z_coord + 1) == false)
-                {
-                    AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::BACK);
-                }
-                if (world->is_block_occupied(x_coord, y_coord, z_coord - 1) == false)
-                {
-                    AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::FRONT);
+                    int y_coord = k;
+                    int x_coord = m_chunk_x * 16 + i;
+                    int z_coord = m_chunk_z * 16 + j;
+                    if (world->is_block_occupied(x_coord + 1, y_coord, z_coord) == false)
+                    {
+                        AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::LEFT);
+                    }
+                    if (world->is_block_occupied(x_coord - 1, y_coord, z_coord) == false)
+                    {
+                        AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::RIGHT);
+                    }
+                    if (world->is_block_occupied(x_coord, y_coord + 1, z_coord) == false)
+                    {
+                        AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::TOP);
+                    }
+                    if (world->is_block_occupied(x_coord, y_coord - 1, z_coord) == false)
+                    {
+                        AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::BOTTOM);
+                    }
+                    if (world->is_block_occupied(x_coord, y_coord, z_coord + 1) == false)
+                    {
+                        AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::BACK);
+                    }
+                    if (world->is_block_occupied(x_coord, y_coord, z_coord - 1) == false)
+                    {
+                        AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::FRONT);
+                    }
                 }
             }
         }
@@ -194,42 +198,47 @@ void MCRFT::Chunk::generate_mesh(MCRFT::World *world)
 }
 void AddFace(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction)
 {
+    float sides_left_x = (0.0 * 16.0) / 256.0;
+    float sides_right_x = (1.0 * 16.0) / 256.0;
+    float sides_top_y = (3.0 * 16.0) / 256.0;
+    float sides_bottom_y = (2.0 * 16.0) / 256.0;
     float VOXEL_VERTICES[] = {
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-
+        // front
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+        // back
+        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
         -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f,
+        // right
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
         -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
         -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f,
         -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-
+        // left
         0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
         0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
         0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 1.0f,
         0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-
+        // bottom
         -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
         0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
         0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
         0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
         -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
         -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-
+        // top
         -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
         0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
         0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
