@@ -129,10 +129,20 @@ int MCRFT::Renderer::loop()
             counter = 0;
         }
         m_camera->update_frame();
-
+        glm::vec3 copyOfOldCameraPos = m_camera->m_camera_pos;
+        glm::vec3 copyOfOldPlayerPos = m_camera->m_curr_player->m_current_pos;
         // input
         // -----
         m_camera->process_input(m_screen->m_window);
+        int curr_x = floor(m_camera->m_curr_player->m_current_pos.x);
+        int curr_y = floor(m_camera->m_curr_player->m_current_pos.y);
+        int curr_z = floor(m_camera->m_curr_player->m_current_pos.z);
+        if (world->is_block_occupied(curr_z, curr_y, curr_z) || world->is_block_occupied(curr_z, curr_y + 1, curr_z))
+        {
+            m_camera->m_camera_pos = copyOfOldCameraPos;
+            m_camera->m_curr_player->m_current_pos = copyOfOldPlayerPos;
+            continue; // Todo, probably just want flag here
+        }
 
         // render
         // ------
@@ -146,7 +156,10 @@ int MCRFT::Renderer::loop()
         // activate shader
         m_shader->use();
         m_camera->update_shaders_projection_mat(m_shader);
-        world->cast_ray(m_camera, m_camera->m_curr_player->m_current_pos);
+        if (glfwGetKey(m_screen->m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        {
+            world->cast_ray(m_camera, m_camera->m_curr_player->m_current_pos);
+        }
         // render boxes
         glBindVertexArray(p_VAO);
         for (unsigned int i = 0; i < 16; i++)
