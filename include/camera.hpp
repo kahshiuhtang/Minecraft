@@ -25,6 +25,10 @@ namespace MCRFT
         void update_frame();
         void process_input(GLFWwindow *window);
         void update_shaders_projection_mat(Shader *m_shader);
+        glm::vec3 getRayDirection()
+        {
+            return glm::normalize(m_camera_front);
+        }
 
         // timing
         float m_delta_time; // time between current frame and last frame

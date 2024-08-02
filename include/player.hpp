@@ -11,7 +11,10 @@ namespace MCRFT
     {
     public:
         glm::vec3 m_current_pos;
+        glm::vec3 m_velocity;
+        glm::vec3 m_acceleration;
         void init();
+        glm::vec3 update_position();
 
     private:
     };

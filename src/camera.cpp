@@ -59,33 +59,42 @@ void MCRFT::Camera::process_input(GLFWwindow *window)
     float camera_speed = static_cast<float>(8.5 * m_delta_time);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        m_curr_player->m_current_pos += camera_speed * m_camera_front;
-        m_camera_pos += camera_speed * m_camera_front;
+        glm::vec3 change = camera_speed * m_camera_front;
+        change.y = 0;
+        m_curr_player->m_current_pos += change;
+        m_camera_pos += change;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        m_curr_player->m_current_pos -= camera_speed * m_camera_front;
-        m_camera_pos -= camera_speed * m_camera_front;
+
+        glm::vec3 change = camera_speed * m_camera_front;
+        change.y = 0;
+        m_curr_player->m_current_pos -= change;
+        m_camera_pos -= change;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        m_curr_player->m_current_pos -= glm::normalize(glm::cross(m_camera_front, m_camera_up)) * camera_speed;
-        m_camera_pos -= glm::normalize(glm::cross(m_camera_front, m_camera_up)) * camera_speed;
+        glm::vec3 change = glm::normalize(glm::cross(m_camera_front, m_camera_up)) * camera_speed;
+        change.y = 0;
+        m_curr_player->m_current_pos -= change;
+        m_camera_pos -= change;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        m_curr_player->m_current_pos += glm::normalize(glm::cross(m_camera_front, m_camera_up)) * camera_speed;
-        m_camera_pos += glm::normalize(glm::cross(m_camera_front, m_camera_up)) * camera_speed;
+        glm::vec3 change = glm::normalize(glm::cross(m_camera_front, m_camera_up)) * camera_speed;
+        change.y = 0;
+        m_curr_player->m_current_pos += change;
+        m_camera_pos += change;
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
-        m_curr_player->m_current_pos += glm::normalize(m_camera_up) * camera_speed;
-        m_camera_pos += glm::normalize(m_camera_up) * camera_speed;
+        m_curr_player->m_current_pos.y += camera_speed;
+        m_camera_pos.y += camera_speed;
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     {
-        m_curr_player->m_current_pos -= glm::normalize(m_camera_up) * camera_speed;
-        m_camera_pos -= glm::normalize(m_camera_up) * camera_speed;
+        m_curr_player->m_current_pos.y -= camera_speed;
+        m_camera_pos.y -= camera_speed;
     }
 }
 

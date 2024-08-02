@@ -32,8 +32,8 @@ namespace MCRFT
     public:
         ChunkSection *m_sections[24]; // 24 sections to cover 384 blocks in height
         int m_max_height[16][16];
-        int m_chunk_x;
-        int m_chunk_z;
+        unsigned int m_chunk_x;
+        unsigned int m_chunk_z;
         std::vector<float> m_mesh_vertices;
         void initialize_chunk(const siv::PerlinNoise *perlin, unsigned int chunk_x, unsigned int chunk_z, const int chunk_size_x, const int chunk_size_z);
         void generate_mesh(World *world);

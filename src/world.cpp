@@ -315,9 +315,8 @@ bool MCRFT::Chunk::remove_block(int x, int y, int z)
         int block_x = x - (16 * m_chunk_x);
         int block_y = y % 16;
         int block_z = z - (16 * m_chunk_z);
-        if (m_sections[chunk_segment] && m_sections[chunk_segment]->blocks[block_x][block_y][block_z] != nullptr)
+        if (m_sections[chunk_segment] != nullptr && m_sections[chunk_segment]->blocks[block_x][block_y][block_z] != nullptr)
         {
-            std::cout << "Removing" << std::endl;
             free(m_sections[chunk_segment]->blocks[block_x][block_y][block_z]);
             m_sections[chunk_segment]->blocks[block_x][block_y][block_z] = nullptr;
             result = true;
@@ -334,7 +333,8 @@ bool MCRFT::World::remove_block(int x, int y, int z)
     bool result = false;
     try
     {
-        Chunk *curr_chunk = this->get_chunk(x, z);
+        Chunk *curr_chunk = this->get_chunk(floor(x / 16), floor(z / 16));
+        std::cout << "TX: " << x << " TY: " << y << " TZ: " << z << std::endl;
         if (curr_chunk == nullptr)
         {
             return result;
@@ -343,6 +343,10 @@ bool MCRFT::World::remove_block(int x, int y, int z)
         if (result)
         {
             curr_chunk->generate_mesh(this);
+        }
+        else
+        {
+            std::cout << "ERROR, didnt generate mesh" << std::endl;
         }
     }
     catch (const std::exception &e)
@@ -359,36 +363,19 @@ void MCRFT::World::cast_ray(Camera *camera, glm::vec3 position)
         {
             return;
         }
-        int max = 10; // block reach
 
-        glm::vec3 sign;
-        glm::vec3 position_copy = position;
-        for (int i = 0; i < 3; ++i)
-            sign[i] = position[i] > 0;
-        // might not be m_camera_front;
-        for (int i = 0; i < max; ++i)
+        glm::vec3 rayOrigin = camera->m_camera_pos;
+        glm::vec3 rayDirection = camera->getRayDirection();
+
+        for (float t = 0; t < 5; t += 0.1f)
         {
-            glm::vec3 tvec = (floor(position_copy + sign) - position_copy) / camera->m_camera_front;
-            float t = std::min(tvec.x, std::min(tvec.y, tvec.z));
+            glm::vec3 currentPos = rayOrigin + t * rayDirection;
 
-            position_copy += camera->m_camera_front * (t + 0.001f);
-            if (position.y >= 0 && position.y < CHUNK_SIZE_Y)
+            // Check if currentPos is inside a block
+            if (this->is_block_occupied(floor(currentPos.x), floor(currentPos.y), floor(currentPos.z)))
             {
-                glm::vec3 pos = glm::vec3(
-                    floor(position_copy.x),
-                    floor(position_copy.y),
-                    floor(position_copy.z));
-                int block_chunk_x = static_cast<int>(floor(pos.x / CHUNK_SIZE_X));
-                int block_chunk_z = static_cast<int>(floor(pos.z / CHUNK_SIZE_Z));
-                int bx = pos.x - (block_chunk_x * CHUNK_SIZE_X);
-                int by = static_cast<int>(floor(pos.y));
-                int bz = pos.z - (block_chunk_z * CHUNK_SIZE_Z);
-                if (this->is_block_occupied(bx, by, bz))
-                {
-                    this->remove_block(bx, by, bz);
-                    std::cout << "X: " << bx << " Y: " << by << " Z: " << bz << std::endl;
-                    return;
-                }
+                this->remove_block(floor(currentPos.x), floor(currentPos.y), floor(currentPos.z));
+                return;
             }
         }
     }
