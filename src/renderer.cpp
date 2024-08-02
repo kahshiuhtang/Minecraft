@@ -114,6 +114,14 @@ int MCRFT::Renderer::loop()
     world->generate_all_chunk_meshes();
     glGenVertexArrays(1, &p_VAO);
     glGenBuffers(1, &p_VBO);
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(m_screen->m_window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+    const char *fps_string = nullptr;
     while (!glfwWindowShouldClose(m_screen->m_window))
     {
         crntTime = glfwGetTime();
@@ -124,6 +132,7 @@ int MCRFT::Renderer::loop()
         {
             std::string FPS = std::to_string((1.0 / timeDiff) * counter);
             std::string new_title = FPS + " FPS";
+            fps_string = new_title.c_str();
             glfwSetWindowTitle(m_screen->m_window, new_title.c_str());
             prevTime = crntTime;
             counter = 0;
@@ -148,6 +157,9 @@ int MCRFT::Renderer::loop()
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
@@ -194,7 +206,21 @@ int MCRFT::Renderer::loop()
                 glDrawArrays(GL_TRIANGLES, 0, vertices->size() / 8);
             }
         }
-
+        ImGui::Begin("FPS");
+        // Text that appears in the window
+        if (fps_string == nullptr)
+        {
+            ImGui::Text("LOADING");
+        }
+        else
+        {
+            ImGui::Text(fps_string);
+        }
+        // Ends the window
+        ImGui::End();
+        // Renders the ImGUI elements
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(m_screen->m_window);
