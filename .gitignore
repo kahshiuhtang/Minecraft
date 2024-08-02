@@ -1,2 +1,5 @@
 build/
 PlanetSim.code-workspace
+include/glm
+.vscode/
+external/
