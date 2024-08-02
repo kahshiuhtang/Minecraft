@@ -30,6 +30,7 @@ namespace MCRFT
         // load and create a texture
         // -------------------------
         unsigned int texture1;
+        unsigned int texture2;
     };
 }
 #endif

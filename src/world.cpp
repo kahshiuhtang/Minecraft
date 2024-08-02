@@ -298,3 +298,41 @@ MCRFT::Chunk *MCRFT::World::get_chunk(int x, int z)
         std::cout << "Chunk generate_mesh(): Exception: " << e.what() << std::endl;
     }
 }
+void MCRFT::World::cast_ray(Camera *camera, glm::vec3 position)
+{
+    try
+    {
+        if (camera == nullptr)
+        {
+            return;
+        }
+        int max = 1; // block reach
+
+        glm::vec3 sign;
+        glm::vec3 position_copy = position;
+        for (int i = 0; i < 3; ++i)
+            sign[i] = position[i] > 0;
+        // might not be m_camera_front;
+        for (int i = 0; i < max; ++i)
+        {
+            glm::vec3 tvec = (floor(position_copy + sign) - position_copy) / camera->m_camera_front;
+            float t = std::min(tvec.x, std::min(tvec.y, tvec.z));
+
+            position += camera->m_camera_front * (t + 0.001f);
+            glm::vec3 pos = glm::vec3(
+                floor(position.x),
+                floor(position.y),
+                floor(position.z));
+            int block_chunk_x = static_cast<int>(floor(pos.x / CHUNK_SIZE_X));
+            int block_chunk_z = static_cast<int>(floor(pos.z / CHUNK_SIZE_Z));
+            int bx = pos.x - (block_chunk_x * CHUNK_SIZE_X);
+            int by = static_cast<int>(floor(pos.y));
+            int bz = pos.z - (block_chunk_z * CHUNK_SIZE_Z);
+            std::cout << "X: " << bx << " Y: " << by << " Z: " << bz << std::endl;
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << "Chunk cast_ray(): Exception: " << e.what() << std::endl;
+    }
+}

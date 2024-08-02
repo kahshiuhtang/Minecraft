@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "external/PerlinNoise.hpp"
+#include "camera.hpp"
 namespace MCRFT
 {
     class World;
@@ -34,7 +35,7 @@ namespace MCRFT
         int m_chunk_x;
         int m_chunk_z;
         std::vector<float> m_mesh_vertices;
-        void initialize_chunk(const siv::PerlinNoise *perlin, unsigned int chunk_x, unsigned int chunk_y, const int chunk_size_x, const int chunk_size_y);
+        void initialize_chunk(const siv::PerlinNoise *perlin, unsigned int chunk_x, unsigned int chunk_z, const int chunk_size_x, const int chunk_size_z);
         void generate_mesh(World *world);
 
     private:
@@ -45,6 +46,7 @@ namespace MCRFT
         void init();
         bool is_block_occupied(int x, int y, int z);
         bool generate_all_chunk_meshes();
+        void cast_ray(Camera *camera, glm::vec3 position);
         Chunk *get_chunk(int x, int z);
 
     private:
