@@ -5,7 +5,9 @@
 1. OpenGL
 2. CMake
 3. g++17
-4. Bullet Physics
+4. GLFW, GLAD
+5. ImGUI
+6. Bullet Physics
 
 ## Install
 
