@@ -33,6 +33,10 @@ bool MCRFT::World::is_block_occupied(int x, int y, int z)
     {
         return false;
     }
+    if (y >= 384)
+    {
+        return false;
+    }
     unsigned int chunk_x = x / 16;
     unsigned int coord_x_within_chunk = x % 16;
     unsigned int segment = y / 16;
@@ -163,6 +167,10 @@ void MCRFT::Chunk::generate_mesh(MCRFT::World *world)
                     int y_coord = k;
                     int x_coord = m_chunk_x * 16 + i;
                     int z_coord = m_chunk_z * 16 + j;
+                    if (world->is_block_occupied(x_coord, y_coord, z_coord) == false)
+                    {
+                        continue;
+                    }
                     if (world->is_block_occupied(x_coord + 1, y_coord, z_coord) == false)
                     {
                         AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::LEFT);
@@ -298,6 +306,51 @@ MCRFT::Chunk *MCRFT::World::get_chunk(int x, int z)
         std::cout << "Chunk generate_mesh(): Exception: " << e.what() << std::endl;
     }
 }
+bool MCRFT::Chunk::remove_block(int x, int y, int z)
+{
+    bool result = false;
+    try
+    {
+        int chunk_segment = floor(y / 16);
+        int block_x = x - (16 * m_chunk_x);
+        int block_y = y % 16;
+        int block_z = z - (16 * m_chunk_z);
+        if (m_sections[chunk_segment] && m_sections[chunk_segment]->blocks[block_x][block_y][block_z] != nullptr)
+        {
+            std::cout << "Removing" << std::endl;
+            free(m_sections[chunk_segment]->blocks[block_x][block_y][block_z]);
+            m_sections[chunk_segment]->blocks[block_x][block_y][block_z] = nullptr;
+            result = true;
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << "Chunk remove_block(): Exception: " << e.what() << std::endl;
+    }
+    return result;
+}
+bool MCRFT::World::remove_block(int x, int y, int z)
+{
+    bool result = false;
+    try
+    {
+        Chunk *curr_chunk = this->get_chunk(x, z);
+        if (curr_chunk == nullptr)
+        {
+            return result;
+        }
+        result = curr_chunk->remove_block(x, y, z);
+        if (result)
+        {
+            curr_chunk->generate_mesh(this);
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << "Chunk remove_block(): Exception: " << e.what() << std::endl;
+    }
+    return result;
+}
 void MCRFT::World::cast_ray(Camera *camera, glm::vec3 position)
 {
     try
@@ -306,7 +359,7 @@ void MCRFT::World::cast_ray(Camera *camera, glm::vec3 position)
         {
             return;
         }
-        int max = 1; // block reach
+        int max = 10; // block reach
 
         glm::vec3 sign;
         glm::vec3 position_copy = position;
@@ -318,17 +371,25 @@ void MCRFT::World::cast_ray(Camera *camera, glm::vec3 position)
             glm::vec3 tvec = (floor(position_copy + sign) - position_copy) / camera->m_camera_front;
             float t = std::min(tvec.x, std::min(tvec.y, tvec.z));
 
-            position += camera->m_camera_front * (t + 0.001f);
-            glm::vec3 pos = glm::vec3(
-                floor(position.x),
-                floor(position.y),
-                floor(position.z));
-            int block_chunk_x = static_cast<int>(floor(pos.x / CHUNK_SIZE_X));
-            int block_chunk_z = static_cast<int>(floor(pos.z / CHUNK_SIZE_Z));
-            int bx = pos.x - (block_chunk_x * CHUNK_SIZE_X);
-            int by = static_cast<int>(floor(pos.y));
-            int bz = pos.z - (block_chunk_z * CHUNK_SIZE_Z);
-            std::cout << "X: " << bx << " Y: " << by << " Z: " << bz << std::endl;
+            position_copy += camera->m_camera_front * (t + 0.001f);
+            if (position.y >= 0 && position.y < CHUNK_SIZE_Y)
+            {
+                glm::vec3 pos = glm::vec3(
+                    floor(position_copy.x),
+                    floor(position_copy.y),
+                    floor(position_copy.z));
+                int block_chunk_x = static_cast<int>(floor(pos.x / CHUNK_SIZE_X));
+                int block_chunk_z = static_cast<int>(floor(pos.z / CHUNK_SIZE_Z));
+                int bx = pos.x - (block_chunk_x * CHUNK_SIZE_X);
+                int by = static_cast<int>(floor(pos.y));
+                int bz = pos.z - (block_chunk_z * CHUNK_SIZE_Z);
+                if (this->is_block_occupied(bx, by, bz))
+                {
+                    this->remove_block(bx, by, bz);
+                    std::cout << "X: " << bx << " Y: " << by << " Z: " << bz << std::endl;
+                    return;
+                }
+            }
         }
     }
     catch (const std::exception &e)

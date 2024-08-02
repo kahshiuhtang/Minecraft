@@ -37,6 +37,7 @@ namespace MCRFT
         std::vector<float> m_mesh_vertices;
         void initialize_chunk(const siv::PerlinNoise *perlin, unsigned int chunk_x, unsigned int chunk_z, const int chunk_size_x, const int chunk_size_z);
         void generate_mesh(World *world);
+        bool remove_block(int x, int y, int z);
 
     private:
     };
@@ -47,6 +48,7 @@ namespace MCRFT
         bool is_block_occupied(int x, int y, int z);
         bool generate_all_chunk_meshes();
         void cast_ray(Camera *camera, glm::vec3 position);
+        bool remove_block(int x, int y, int z);
         Chunk *get_chunk(int x, int z);
 
     private:

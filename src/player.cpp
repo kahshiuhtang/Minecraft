@@ -2,5 +2,5 @@
 
 void MCRFT::Player::init()
 {
-    m_current_pos = glm::vec3(-15.0f, 100.0f, -15.0f);
+    m_current_pos = glm::vec3(-15.0f, 99.0f, -15.0f);
 }
