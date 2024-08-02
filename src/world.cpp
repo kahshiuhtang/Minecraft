@@ -210,49 +210,55 @@ void AddFace(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction
     float sides_right_x = (1.0 * 16.0) / 256.0;
     float sides_top_y = (3.0 * 16.0) / 256.0;
     float sides_bottom_y = (2.0 * 16.0) / 256.0;
+    const float GRASS_SIDE_LEFT = (2.0 * 64.0) / 3048.0;
+    const float GRASS_SIDE_RIGHT = (3.0 * 64.0) / 3048.0;
+    const float GRASS_TOP_LEFT = (0.0 * 64.0) / 3048.0;
+    const float GRASS_TOP_RIGHT = (1.0 * 64.0) / 3048.0;
+    const float GRASS_BOTTOM_LEFT = (1.0 * 64.0) / 3048.0;
+    const float GRASS_BOTTOM_RIGHT = (2.0 * 64.0) / 3048.0;
     float VOXEL_VERTICES[] = {
         // front
-        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, GRASS_SIDE_RIGHT, 1.0f,
+        0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, 1.0f,
+        0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, 0.0f,
+        0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, 0.0f,
+        -0.5f, 0.5f, -0.5f, GRASS_SIDE_RIGHT, 0.0f,
+        -0.5f, -0.5f, -0.5f, GRASS_SIDE_RIGHT, 1.0f,
         // back
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, 1.0f,
+        0.5f, -0.5f, 0.5f, GRASS_SIDE_LEFT, 1.0f,
+        0.5f, 0.5f, 0.5f, GRASS_SIDE_LEFT, 0.0f,
+        0.5f, 0.5f, 0.5f, GRASS_SIDE_LEFT, 0.0f,
+        -0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, 0.0f,
+        -0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, 1.0f,
         // right
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, 0.0f,
+        -0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, 0.0f,
+        -0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, 1.0f,
+        -0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, 1.0f,
+        -0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, 1.0f,
+        -0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, 0.0f,
         // left
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, 0.0f,
+        0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, 0.0f,
+        0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, 1.0f,
+        0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, 1.0f,
+        0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, 1.0f,
+        0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, 0.0f,
         // bottom
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, GRASS_BOTTOM_LEFT, 1.0f,
+        0.5f, -0.5f, -0.5f, GRASS_BOTTOM_RIGHT, 1.0f,
+        0.5f, -0.5f, 0.5f, GRASS_BOTTOM_RIGHT, 0.0f,
+        0.5f, -0.5f, 0.5f, GRASS_BOTTOM_RIGHT, 0.0f,
+        -0.5f, -0.5f, 0.5f, GRASS_BOTTOM_LEFT, 0.0f,
+        -0.5f, -0.5f, -0.5f, GRASS_BOTTOM_LEFT, 1.0f,
         // top
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f};
+        -0.5f, 0.5f, -0.5f, GRASS_TOP_LEFT, 1.0f,
+        0.5f, 0.5f, -0.5f, GRASS_TOP_RIGHT, 1.0f,
+        0.5f, 0.5f, 0.5f, GRASS_TOP_RIGHT, 0.0f,
+        0.5f, 0.5f, 0.5f, GRASS_TOP_RIGHT, 0.0f,
+        -0.5f, 0.5f, 0.5f, GRASS_TOP_LEFT, 0.0f,
+        -0.5f, 0.5f, -0.5f, GRASS_TOP_LEFT, 1.0f};
     int index = 0;
     switch (direction)
     {

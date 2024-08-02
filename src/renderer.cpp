@@ -38,10 +38,10 @@ int MCRFT::Renderer::init_textures()
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    unsigned char *data = stbi_load(std::filesystem::path("../rsrc/side.jpg").c_str(), &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load(std::filesystem::path("../rsrc/64x64_sheet.png").c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -71,7 +71,33 @@ int MCRFT::Renderer::init_textures()
         std::cout << "Failed to load texture" << std::endl;
     }
     stbi_image_free(data);
+    data = stbi_load(std::filesystem::path("../rsrc/crosshair.png").c_str(), &m_crosshairWidth, &m_crosshairHeight, &m_crosshairChannels, 0);
+    if (data)
+    {
+        glGenTextures(1, &m_crosshairTextureID);
+        glBindTexture(GL_TEXTURE_2D, m_crosshairTextureID);
+        GLenum format = (m_crosshairChannels == 4) ? GL_RGBA : GL_RGB;
+        glTexImage2D(GL_TEXTURE_2D, 0, format, m_crosshairWidth, m_crosshairHeight, 0, format, GL_UNSIGNED_BYTE, data);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cerr << "Failed to load crosshair texture" << std::endl;
+    }
     return 0;
+}
+int MCRFT::Renderer::_render_crosshair()
+{
+    int error = 0;
+    try
+    {
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << "Renderer _render_crosshair(): Exception: " << e.what() << std::endl;
+    }
+    return error;
 }
 int MCRFT::Renderer::loop()
 {

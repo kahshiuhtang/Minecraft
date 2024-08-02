@@ -20,6 +20,7 @@ namespace MCRFT
         int loop();
         int setup_shaders();
         int destroy_renderer();
+        int _render_crosshair();
 
     private:
         Shader *m_shader;
@@ -31,6 +32,8 @@ namespace MCRFT
         // -------------------------
         unsigned int texture1;
         unsigned int texture2;
+        GLuint m_crosshairTextureID;
+        int m_crosshairWidth, m_crosshairHeight, m_crosshairChannels;
     };
 }
 #endif
