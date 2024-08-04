@@ -12,6 +12,9 @@ int MCRFT::Renderer::init()
     setup_shaders();
     init_textures();
     m_shader->use();
+    m_world = new World();
+    m_world->init();
+    m_world->generate_all_chunk_meshes();
     m_shader->setInt("texture1", 0);
     m_shader->setInt("texture2", 1);
     return 0;
@@ -98,6 +101,47 @@ int MCRFT::Renderer::_render_crosshair()
     }
     return error;
 }
+int MCRFT::Renderer::render_map_meshes()
+{
+    int error = 0;
+    try
+    {
+        for (unsigned int i = 0; i < 16; i++)
+        {
+            for (unsigned int j = 0; j < 16; j++)
+            {
+
+                glBindVertexArray(p_VAO);
+                Chunk *chunk = m_world->get_chunk(i, j);
+                if (chunk == nullptr)
+                {
+                    continue;
+                }
+                std::vector<float> *vertices = &(chunk->m_mesh_vertices);
+                glm::mat4 model = glm::mat4(1.0f);
+                m_shader->setMat4("model", model);
+                glBindBuffer(GL_ARRAY_BUFFER, p_VBO);
+                glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(float), vertices->data(), GL_STATIC_DRAW);
+
+                // position attribute
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+                glEnableVertexAttribArray(0);
+                // texture coord attribute
+                glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+                glEnableVertexAttribArray(1);
+                glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(5 * sizeof(float)));
+                glEnableVertexAttribArray(2);
+                glDrawArrays(GL_TRIANGLES, 0, vertices->size() / 8);
+            }
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << "Renderer render_map_meshes(): Exception: " << e.what() << std::endl;
+    }
+    return error;
+}
+
 int MCRFT::Renderer::loop()
 {
     // render loop
@@ -108,9 +152,6 @@ int MCRFT::Renderer::loop()
     double crntTime = 0.0;
     double timeDiff;
     unsigned int counter = 0;
-    World *world = new World();
-    world->init();
-    world->generate_all_chunk_meshes();
     glGenVertexArrays(1, &p_VAO);
     glGenBuffers(1, &p_VBO);
     IMGUI_CHECKVERSION();
@@ -145,7 +186,7 @@ int MCRFT::Renderer::loop()
         int curr_x = floor(m_camera->m_curr_player->m_current_pos.x);
         int curr_y = floor(m_camera->m_curr_player->m_current_pos.y);
         int curr_z = floor(m_camera->m_curr_player->m_current_pos.z);
-        if (world->isInsideBlock(curr_x, curr_y, curr_z))
+        if (m_world->isInsideBlock(curr_x, curr_y, curr_z))
         {
             m_camera->m_camera_pos = copyOfOldCameraPos;
             m_camera->m_curr_player->m_current_pos = copyOfOldPlayerPos;
@@ -169,42 +210,10 @@ int MCRFT::Renderer::loop()
         m_camera->update_shaders_projection_mat(m_shader);
         if (glfwGetMouseButton(m_screen->m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         {
-            world->cast_ray(m_camera, m_camera->m_curr_player->m_current_pos);
+            this->m_world->cast_ray(m_camera, m_camera->m_curr_player->m_current_pos);
         }
         // render boxes
-        glBindVertexArray(p_VAO);
-        for (unsigned int i = 0; i < 16; i++)
-        {
-            for (unsigned int j = 0; j < 16; j++)
-            {
-
-                glBindVertexArray(p_VAO);
-                /*
-                Want position, texture, world_position
-                Uniform
-                */
-                Chunk *chunk = world->get_chunk(i, j);
-                if (chunk == nullptr)
-                {
-                    continue;
-                }
-                std::vector<float> *vertices = &(chunk->m_mesh_vertices);
-                glm::mat4 model = glm::mat4(1.0f);
-                m_shader->setMat4("model", model);
-                glBindBuffer(GL_ARRAY_BUFFER, p_VBO);
-                glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(float), vertices->data(), GL_STATIC_DRAW);
-
-                // position attribute
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-                glEnableVertexAttribArray(0);
-                // texture coord attribute
-                glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-                glEnableVertexAttribArray(1);
-                glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(5 * sizeof(float)));
-                glEnableVertexAttribArray(2);
-                glDrawArrays(GL_TRIANGLES, 0, vertices->size() / 8);
-            }
-        }
+        this->render_map_meshes();
         ImGui::Begin("FPS");
         // Text that appears in the window
         if (fps_string == nullptr)
