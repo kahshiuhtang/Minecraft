@@ -1,5 +1,5 @@
-#ifndef WORLD_HPP
-#define WORLD_HPP
+#ifndef MCRFT_WORLD_HPP
+#define MCRFT_WORLD_HPP
 
 #include <vector>
 #include "external/PerlinNoise.hpp"

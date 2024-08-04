@@ -1,5 +1,5 @@
-#ifndef CAMERA_HPP
-#define CAMERA_HPP
+#ifndef MCRFT_CAMERA_HPP
+#define MCRFT_CAMERA_HPP
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

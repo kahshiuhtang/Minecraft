@@ -1,5 +1,5 @@
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef MCRFT_RENDERER_HPP
+#define MCRFT_RENDERER_HPP
 
 #include <filesystem>
 

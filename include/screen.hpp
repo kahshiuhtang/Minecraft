@@ -1,5 +1,5 @@
-#ifndef SCREEN_HPP
-#define SCREEN_HPP
+#ifndef MCRFT_SCREEN_HPP
+#define MCRFT_SCREEN_HPP
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

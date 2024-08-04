@@ -1,5 +1,5 @@
-#ifndef PHYSICS_HPP
-#define PHYSICS_HPP
+#ifndef MCRFT_PHYSICS_HPP
+#define MCRFT_PHYSICS_HPP
 
 #include "btBulletDynamicsCommon.h"
 namespace MCRFT
