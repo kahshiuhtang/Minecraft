@@ -11,7 +11,7 @@
 #include "external/imgui/imgui_impl_opengl3.h"
 
 #include "screen.hpp"
-#include "shader.hpp"
+#include "renderer/shader.hpp"
 #include "camera.hpp"
 #include "world/world.hpp"
 

@@ -15,8 +15,8 @@ int MCRFT::Renderer::init()
     m_world = new World();
     m_world->init();
     m_world->generate_all_chunk_meshes();
-    m_shader->setInt("texture1", 0);
-    m_shader->setInt("texture2", 1);
+    m_shader->set_int("texture1", 0);
+    m_shader->set_int("texture2", 1);
     return 0;
 }
 int MCRFT::Renderer::setup_shaders()
@@ -119,7 +119,7 @@ int MCRFT::Renderer::render_map_meshes()
                 }
                 std::vector<float> *vertices = &(chunk->m_mesh_vertices);
                 glm::mat4 model = glm::mat4(1.0f);
-                m_shader->setMat4("model", model);
+                m_shader->set_mat4("model", model);
                 glBindBuffer(GL_ARRAY_BUFFER, p_VBO);
                 glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(float), vertices->data(), GL_STATIC_DRAW);
 

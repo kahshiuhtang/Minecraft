@@ -29,7 +29,6 @@ MCRFT::Camera::Camera(GLFWwindow *m_window)
         m_fov = 45.0f;
 
         m_curr_player = new MCRFT::Player();
-        m_curr_player->init();
         glfwSetCursorPosCallback(m_window, mouse_callback);
         glfwSetScrollCallback(m_window, scroll_callback);
     }
@@ -52,11 +51,11 @@ void MCRFT::Camera::update_shaders_projection_mat(Shader *shader)
     {
         // pass projection matrix to shader (note that in this case it could change every frame)
         glm::mat4 projection = glm::perspective(glm::radians(m_fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        shader->setMat4("projection", projection);
+        shader->set_mat4("projection", projection);
 
         // camera/view transformation
         glm::mat4 view = glm::lookAt(m_camera_pos, m_camera_pos + m_camera_front, m_camera_up);
-        shader->setMat4("view", view);
+        shader->set_mat4("view", view);
     }
     catch (const std::exception &e)
     {

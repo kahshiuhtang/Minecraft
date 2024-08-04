@@ -9,7 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "player.hpp"
-#include "shader.hpp"
+#include "renderer/shader.hpp"
 
 namespace MCRFT
 {
