@@ -61,7 +61,7 @@ add_executable(minecraft
                 include/camera.hpp
                 include/renderer/renderer.hpp
                 include/screen.hpp
-                include/shader.hpp
+                include/renderer/shader.hpp
                 include/player.hpp
                 include/world/world.hpp
                 ${IMGUI_SRC}
