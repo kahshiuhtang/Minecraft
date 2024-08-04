@@ -1,4 +1,4 @@
-#include "world.hpp"
+#include "world/world.hpp"
 #include "iostream"
 
 void AddFace(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction);
@@ -293,6 +293,17 @@ void AddFace(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction
         vertices->push_back(z);
     }
 }
+bool MCRFT::World::isInsideBlock(int x, int y, int z)
+{
+    bool res = false;
+    res = res || this->is_block_occupied(x + 1, y, z);
+    res = res || this->is_block_occupied(x, y, z + 1);
+    res = res || this->is_block_occupied(x + 1, y, z + 1);
+    res = res || this->is_block_occupied(x + 1, y + 1, z);
+    res = res || this->is_block_occupied(x, y + 1, z + 1);
+    res = res || this->is_block_occupied(x + 1, y + 1, z + 1);
+    return res;
+}
 MCRFT::Chunk *MCRFT::World::get_chunk(int x, int z)
 {
     try
@@ -371,7 +382,7 @@ void MCRFT::World::cast_ray(Camera *camera, glm::vec3 position)
         }
 
         glm::vec3 rayOrigin = camera->m_camera_pos;
-        glm::vec3 rayDirection = camera->getRayDirection();
+        glm::vec3 rayDirection = camera->get_ray_direction();
 
         for (float t = 0; t < 5; t += 0.1f)
         {

@@ -15,20 +15,13 @@ namespace MCRFT
 {
     class Camera
     {
-    private:
-        // settings
-        const unsigned int SCR_WIDTH = 800;
-        const unsigned int SCR_HEIGHT = 600;
 
     public:
-        void init_camera(GLFWwindow *m_window);
-        void update_frame();
+        Camera(GLFWwindow *m_window);
+        glm::vec3 get_ray_direction();
         void process_input(GLFWwindow *window);
+        void update_frame();
         void update_shaders_projection_mat(Shader *m_shader);
-        glm::vec3 getRayDirection()
-        {
-            return glm::normalize(m_camera_front);
-        }
 
         // timing
         float m_delta_time; // time between current frame and last frame
@@ -48,6 +41,11 @@ namespace MCRFT
         float m_last_x;
         float m_last_y;
         float m_fov;
+
+    private:
+        // settings
+        const unsigned int SCR_WIDTH = 800;
+        const unsigned int SCR_HEIGHT = 600;
     };
 }
 #endif

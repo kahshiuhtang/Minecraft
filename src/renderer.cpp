@@ -1,5 +1,5 @@
-#include "renderer.hpp"
-#include "world.hpp"
+#include "renderer/renderer.hpp"
+#include "world/world.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <external/stb_image.h>
@@ -8,8 +8,7 @@ int MCRFT::Renderer::init()
 {
     m_screen = new Screen();
     m_screen->init_window();
-    m_camera = new Camera();
-    m_camera->init_camera(m_screen->m_window);
+    m_camera = new Camera(m_screen->m_window);
     setup_shaders();
     init_textures();
     m_shader->use();
@@ -146,7 +145,7 @@ int MCRFT::Renderer::loop()
         int curr_x = floor(m_camera->m_curr_player->m_current_pos.x);
         int curr_y = floor(m_camera->m_curr_player->m_current_pos.y);
         int curr_z = floor(m_camera->m_curr_player->m_current_pos.z);
-        if (world->is_block_occupied(curr_z, curr_y, curr_z) || world->is_block_occupied(curr_z, curr_y + 1, curr_z))
+        if (world->isInsideBlock(curr_x, curr_y, curr_z))
         {
             m_camera->m_camera_pos = copyOfOldCameraPos;
             m_camera->m_curr_player->m_current_pos = copyOfOldPlayerPos;
@@ -168,7 +167,7 @@ int MCRFT::Renderer::loop()
         // activate shader
         m_shader->use();
         m_camera->update_shaders_projection_mat(m_shader);
-        if (glfwGetKey(m_screen->m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        if (glfwGetMouseButton(m_screen->m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         {
             world->cast_ray(m_camera, m_camera->m_curr_player->m_current_pos);
         }

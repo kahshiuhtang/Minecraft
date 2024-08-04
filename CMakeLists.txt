@@ -36,17 +36,17 @@ FetchContent_MakeAvailable(assimp)
 add_library(compiler_flags INTERFACE)
 target_compile_features(compiler_flags INTERFACE cxx_std_17)
 set(IMGUI_SRC
-        include/imgui/imgui_impl_opengl3.h
-        include/imgui/imgui_impl_opengl3.cpp
-        include/imgui/imgui_impl_opengl3_loader.h
-        include/imgui/imgui_impl_glfw.h
-        include/imgui/imgui_impl_glfw.cpp
-        include/imgui/imgui.h
-        include/imgui/imgui.cpp
-        include/imgui/imgui_draw.cpp
-        include/imgui/imgui_tables.cpp
-        include/imgui/imgui_widgets.cpp
-        include/imgui/imgui_demo.cpp
+        include/external/imgui/imgui_impl_opengl3.h
+        include/external/imgui/imgui_impl_opengl3.cpp
+        include/external/imgui/imgui_impl_opengl3_loader.h
+        include/external/imgui/imgui_impl_glfw.h
+        include/external/imgui/imgui_impl_glfw.cpp
+        include/external/imgui/imgui.h
+        include/external/imgui/imgui.cpp
+        include/external/imgui/imgui_draw.cpp
+        include/external/imgui/imgui_tables.cpp
+        include/external/imgui/imgui_widgets.cpp
+        include/external/imgui/imgui_demo.cpp
         )
 
 add_executable(minecraft 
@@ -59,11 +59,11 @@ add_executable(minecraft
                 src/player.cpp
                 src/world.cpp
                 include/camera.hpp
-                include/renderer.hpp
+                include/renderer/renderer.hpp
                 include/screen.hpp
                 include/shader.hpp
                 include/player.hpp
-                include/world.hpp
+                include/world/world.hpp
                 ${IMGUI_SRC}
                 )
 

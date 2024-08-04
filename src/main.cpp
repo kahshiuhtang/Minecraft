@@ -1,5 +1,5 @@
-#include "renderer.hpp"
-#include "world.hpp"
+#include "renderer/renderer.hpp"
+#include "world/world.hpp"
 int main()
 {
 

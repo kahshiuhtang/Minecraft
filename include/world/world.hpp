@@ -49,6 +49,7 @@ namespace MCRFT
         bool generate_all_chunk_meshes();
         void cast_ray(Camera *camera, glm::vec3 position);
         bool remove_block(int x, int y, int z);
+        bool isInsideBlock(int x, int y, int z);
         Chunk *get_chunk(int x, int z);
 
     private:
