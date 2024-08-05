@@ -6,11 +6,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "external/imgui/imgui.h"
-#include "external/imgui/imgui_impl_glfw.h"
-#include "external/imgui/imgui_impl_opengl3.h"
-
 #include "renderer/shader.hpp"
+#include "renderer/gui.hpp"
 #include "renderer/texture.hpp"
 #include "world/world.hpp"
 #include "screen.hpp"
@@ -34,6 +31,7 @@ namespace MCRFT
         Camera *m_camera;
         Screen *m_screen;
         World *m_world;
+        Gui *m_gui;
         TextureManager *m_texture_manager;
         unsigned int p_VBO;
         unsigned int p_VAO;
