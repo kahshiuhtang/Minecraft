@@ -1,23 +1,20 @@
 #include "renderer/renderer.hpp"
 #include "world/world.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <external/stb_image.h>
-
-int MCRFT::Renderer::init()
+MCRFT::Renderer::Renderer()
 {
     m_screen = new Screen();
     m_screen->init_window();
     m_camera = new Camera(m_screen->m_window);
     setup_shaders();
-    init_textures();
     m_shader->use();
     m_world = new World();
     m_world->init();
     m_world->generate_all_chunk_meshes();
+    m_texture_manager = new TextureManager();
+    init_textures();
     m_shader->set_int("texture1", 0);
     m_shader->set_int("texture2", 1);
-    return 0;
 }
 int MCRFT::Renderer::setup_shaders()
 {
@@ -27,66 +24,8 @@ int MCRFT::Renderer::setup_shaders()
 }
 int MCRFT::Renderer::init_textures()
 {
-    // texture 1
-    // ---------
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    unsigned char *data = stbi_load(std::filesystem::path("../rsrc/64x64_sheet.png").c_str(), &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
-    glGenTextures(1, &texture2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
-    data = stbi_load(std::filesystem::path("../rsrc/grass-top.png").c_str(), &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-    data = stbi_load(std::filesystem::path("../rsrc/crosshair.png").c_str(), &m_crosshairWidth, &m_crosshairHeight, &m_crosshairChannels, 0);
-    if (data)
-    {
-        glGenTextures(1, &m_crosshairTextureID);
-        glBindTexture(GL_TEXTURE_2D, m_crosshairTextureID);
-        GLenum format = (m_crosshairChannels == 4) ? GL_RGBA : GL_RGB;
-        glTexImage2D(GL_TEXTURE_2D, 0, format, m_crosshairWidth, m_crosshairHeight, 0, format, GL_UNSIGNED_BYTE, data);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cerr << "Failed to load crosshair texture" << std::endl;
-    }
+    m_texture_manager->add_texture("../rsrc/64x64_sheet.png");
+    m_texture_manager->add_texture("../rsrc/crosshair.png");
     return 0;
 }
 int MCRFT::Renderer::_render_crosshair()
@@ -146,8 +85,6 @@ int MCRFT::Renderer::loop()
 {
     // render loop
     // -----------
-    const siv::PerlinNoise::seed_type seed = 123456u;
-    const siv::PerlinNoise perlin{seed};
     double prevTime = 0.0;
     double crntTime = 0.0;
     double timeDiff;
@@ -203,7 +140,11 @@ int MCRFT::Renderer::loop()
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
+        if (!m_texture_manager->get_texture(1))
+        {
+            continue;
+        }
+        glBindTexture(GL_TEXTURE_2D, m_texture_manager->get_texture(1)->m_texture_id);
 
         // activate shader
         m_shader->use();

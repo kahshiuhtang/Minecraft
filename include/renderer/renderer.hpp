@@ -10,17 +10,18 @@
 #include "external/imgui/imgui_impl_glfw.h"
 #include "external/imgui/imgui_impl_opengl3.h"
 
-#include "screen.hpp"
 #include "renderer/shader.hpp"
-#include "camera.hpp"
+#include "renderer/texture.hpp"
 #include "world/world.hpp"
+#include "screen.hpp"
+#include "camera.hpp"
 
 namespace MCRFT
 {
     class Renderer
     {
     public:
-        int init();
+        Renderer();
         int init_textures();
         int destroy_renderer();
         int _render_crosshair();
@@ -33,12 +34,11 @@ namespace MCRFT
         Camera *m_camera;
         Screen *m_screen;
         World *m_world;
+        TextureManager *m_texture_manager;
         unsigned int p_VBO;
         unsigned int p_VAO;
         // load and create a texture
         // -------------------------
-        unsigned int texture1;
-        unsigned int texture2;
         GLuint m_crosshairTextureID;
         int m_crosshairWidth, m_crosshairHeight, m_crosshairChannels;
     };

@@ -58,12 +58,14 @@ add_executable(minecraft
                 src/screen.cpp
                 src/player.cpp
                 src/world.cpp
+                src/texture.cpp
                 include/camera.hpp
                 include/renderer/renderer.hpp
                 include/screen.hpp
                 include/renderer/shader.hpp
                 include/player.hpp
                 include/world/world.hpp
+                include/renderer/texture.hpp
                 ${IMGUI_SRC}
                 )
 
