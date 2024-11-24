@@ -2,32 +2,13 @@
 
 ## Dependencies
 
-1. OpenGL
-2. CMake
-3. g++17
-4. GLFW, GLAD
-5. ImGUI
-6. Bullet Physics
-
-## Install
-
-Linux:
-
-```bash
-git clone https://github.com/Microsoft/vcpkg.git
-cd vcpkg
-./bootstrap-vcpkg.sh
-./vcpkg integrate install
-./vcpkg install bullet3
-sudo apt-get install libbullet-dev
-
-```
+OpenGL, CMake, g++17, GLFW, GLAD, ImGUI
 
 ## To Run
 
 ```bash
 cd build
-cmake --build /home/kahshiuh/Documents/projects/Minecraft/build --config Debug --target all --
+cmake --build . --config Debug --target all --
 ./minecraft
 ```
 
