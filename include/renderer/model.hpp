@@ -5,7 +5,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <stb_image.h>
+#include "external/stb_image.h"
 #include <assimp/Importer.hpp> 
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -33,8 +33,6 @@ class Model
         std::vector<MCRFT::Mesh>    meshes;
         std::string directory;
         bool gammaCorrection;
-        std::vector<MCRFT::Mesh> meshes;
-        std::string directory;
 
         void load_model(std::string path);
         void process_node(aiNode *node, const aiScene *scene);
