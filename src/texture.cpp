@@ -69,3 +69,8 @@ MCRFT::Texture *MCRFT::TextureManager::get_texture(unsigned int id)
     }
     return nullptr;
 }
+
+MCRFT::Texture::Texture()
+{
+
+}
