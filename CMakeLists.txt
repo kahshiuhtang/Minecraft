@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 3.11)
-project(minecraft VERSION 0.1.0)
+
+cmake_policy(SET CMP0072 NEW)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_FLAGS "-lstdc++fs -std=c++17")
-cmake_policy(SET CMP0072 NEW)
+
+project(minecraft VERSION 0.1.0)
+set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/external)
+
+file(MAKE_DIRECTORY ${EXTERNAL_DIR})
 
 find_package(OpenGL REQUIRED)
 
@@ -13,6 +18,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(BULLET_PHYSICS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 
 include_directories(include)
+include_directories(external)
 
 include(FetchContent)
 
@@ -36,17 +42,17 @@ FetchContent_MakeAvailable(assimp)
 add_library(compiler_flags INTERFACE)
 target_compile_features(compiler_flags INTERFACE cxx_std_17)
 set(IMGUI_SRC
-        include/external/imgui/imgui_impl_opengl3.h
-        include/external/imgui/imgui_impl_opengl3.cpp
-        include/external/imgui/imgui_impl_opengl3_loader.h
-        include/external/imgui/imgui_impl_glfw.h
-        include/external/imgui/imgui_impl_glfw.cpp
-        include/external/imgui/imgui.h
-        include/external/imgui/imgui.cpp
-        include/external/imgui/imgui_draw.cpp
-        include/external/imgui/imgui_tables.cpp
-        include/external/imgui/imgui_widgets.cpp
-        include/external/imgui/imgui_demo.cpp
+        external/imgui/imgui_impl_opengl3.h
+        external/imgui/imgui_impl_opengl3.cpp
+        external/imgui/imgui_impl_opengl3_loader.h
+        external/imgui/imgui_impl_glfw.h
+        external/imgui/imgui_impl_glfw.cpp
+        external/imgui/imgui.h
+        external/imgui/imgui.cpp
+        external/imgui/imgui_draw.cpp
+        external/imgui/imgui_tables.cpp
+        external/imgui/imgui_widgets.cpp
+        external/imgui/imgui_demo.cpp
         )
 
 add_executable(minecraft 
@@ -72,7 +78,7 @@ add_executable(minecraft
                 ${IMGUI_SRC}
                 )
 
-target_include_directories(minecraft PRIVATE include)
+target_include_directories(minecraft PRIVATE include external)
 target_compile_definitions(minecraft PUBLIC ${BULLET_DEFINITIONS})
 target_link_directories(minecraft PUBLIC ${Bullet_DIR}/${BULLET_ROOT_DIR}/${BULLET_LIBRARY_DIRS})
 target_link_libraries(minecraft 

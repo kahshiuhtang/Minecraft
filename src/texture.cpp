@@ -1,7 +1,7 @@
 #include "renderer/texture.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION // use of stb functions once and for all
-#include "external/stb_image.h"
+#include "stb_image.h"
 MCRFT::TextureManager::TextureManager()
 {
     m_next_texture_id = 1;
