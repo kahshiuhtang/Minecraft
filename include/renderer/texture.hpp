@@ -16,6 +16,7 @@ namespace MCRFT
     public:
         Texture(unsigned int *id);
         unsigned int m_texture_id;
+        std::string m_type;
 
     private:
     };
