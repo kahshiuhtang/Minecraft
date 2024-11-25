@@ -19,10 +19,14 @@ void MCRFT::Model::load_model(std::string path)
 void MCRFT::Model::process_node(aiNode *node, const aiScene *scene)
 {
     // process all the node's meshes (if any)
+    if(node == nullptr || scene == nullptr){
+        std::cout << "error, null pointer" << std::endl;
+        return;
+    }
     for(unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]]; 
-        meshes.push_back(process_mesh(mesh, scene));			
+        meshes.push_back(process_mesh(mesh, scene));
     }
     // then do the same for each of its children
     for(unsigned int i = 0; i < node->mNumChildren; i++)
@@ -64,15 +68,17 @@ MCRFT::Mesh MCRFT::Model::process_mesh(aiMesh *mesh, const aiScene *scene)
             vec.y = mesh->mTextureCoords[0][i].y;
             vertex.TexCoords = vec;
             // tangent
-            vector.x = mesh->mTangents[i].x;
-            vector.y = mesh->mTangents[i].y;
-            vector.z = mesh->mTangents[i].z;
-            vertex.Tangent = vector;
-            // bitangent
-            vector.x = mesh->mBitangents[i].x;
-            vector.y = mesh->mBitangents[i].y;
-            vector.z = mesh->mBitangents[i].z;
-            vertex.Bitangent = vector;
+            if(mesh->HasTangentsAndBitangents()){
+                vector.x = mesh->mTangents[i].x;
+                vector.y = mesh->mTangents[i].y;
+                vector.z = mesh->mTangents[i].z;
+                vertex.Tangent = vector;
+                // bitangent
+                vector.x = mesh->mBitangents[i].x;
+                vector.y = mesh->mBitangents[i].y;
+                vector.z = mesh->mBitangents[i].z;
+                vertex.Bitangent = vector;
+            }
         }
         else
             vertex.TexCoords = glm::vec2(0.0f, 0.0f);

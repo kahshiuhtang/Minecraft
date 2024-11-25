@@ -22,6 +22,10 @@ namespace MCRFT
         void process_input(GLFWwindow *window);
         void update_frame();
         void update_shaders_projection_mat(Shader *m_shader);
+        glm::mat4 get_viewmatrix()
+        {
+            return glm::lookAt(m_camera_pos, m_camera_pos + m_camera_front, m_camera_up);
+        }
 
         // timing
         float m_delta_time; // time between current frame and last frame
@@ -41,6 +45,7 @@ namespace MCRFT
         float m_last_x;
         float m_last_y;
         float m_fov;
+        float m_zoom = 0.45;
 
     private:
         // settings
