@@ -10,7 +10,7 @@ MCRFT::Texture::Texture(unsigned int *id)
 {
     m_texture_id = *id;
 }
-unsigned int MCRFT::TextureManager::add_texture(std::string file_path)
+unsigned int MCRFT::TextureManager::addtexture(std::string file_path)
 {
     unsigned int res = 0;
     try
@@ -44,12 +44,12 @@ unsigned int MCRFT::TextureManager::add_texture(std::string file_path)
     }
     catch (const std::exception &e)
     {
-        std::cout << "TextureManager add_texture(): Exception: " << e.what() << std::endl;
+        std::cout << "TextureManager addtexture(): Exception: " << e.what() << std::endl;
     }
     return res;
 }
 
-MCRFT::Texture *MCRFT::TextureManager::get_texture(unsigned int id)
+MCRFT::Texture *MCRFT::TextureManager::gettexture(unsigned int id)
 {
     try
     {
@@ -65,7 +65,7 @@ MCRFT::Texture *MCRFT::TextureManager::get_texture(unsigned int id)
     }
     catch (const std::exception &e)
     {
-        std::cout << "TextureManager get_texture(): Exception: " << e.what() << std::endl;
+        std::cout << "TextureManager gettexture(): Exception: " << e.what() << std::endl;
     }
     return nullptr;
 }

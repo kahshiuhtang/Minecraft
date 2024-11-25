@@ -3,7 +3,7 @@
 MCRFT::Screen *screen = nullptr;
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
-int MCRFT::Screen::init_window()
+int MCRFT::Screen::setupwindow()
 {
     if (screen != nullptr)
     {
@@ -25,7 +25,7 @@ int MCRFT::Screen::init_window()
         return -1;
     }
     glfwMakeContextCurrent(m_window);
-    init_callbacks();
+    setupinputcallbacks();
     // tell GLFW to capture our mouse
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -43,7 +43,7 @@ int MCRFT::Screen::init_window()
     screen = this;
     return 0;
 }
-int MCRFT::Screen::init_callbacks()
+int MCRFT::Screen::setupinputcallbacks()
 {
     glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
     return 0;

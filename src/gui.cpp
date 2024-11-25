@@ -10,13 +10,13 @@ MCRFT::Gui::Gui(GLFWwindow *window)
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 }
-void MCRFT::Gui::start_new_frame()
+void MCRFT::Gui::startnewframe()
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 }
-void MCRFT::Gui::render_frame(const char *fps_string)
+void MCRFT::Gui::renderframe(const char *fps_string)
 {
     ImGui::Begin("FPS");
     // Text that appears in the window

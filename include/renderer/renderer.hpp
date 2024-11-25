@@ -20,12 +20,12 @@ namespace MCRFT
     {
     public:
         Renderer();
-        int init_textures();
-        int destroy_renderer();
-        int _render_crosshair();
+        int setuptextures();
+        int destroyrenderer();
+        int rendercrosshair();
         int loop();
-        int render_map_meshes();
-        int setup_shaders();
+        int rendermapmeshes();
+        int setupshaders();
 
     private:
         Shader *m_shader;

@@ -4,32 +4,32 @@
 MCRFT::Renderer::Renderer()
 {
     m_screen = new Screen();
-    m_screen->init_window();
+    m_screen->setupwindow();
     m_camera = new Camera(m_screen->m_window);
-    setup_shaders();
+    setupshaders();
     m_shader->use();
     m_world = new World();
     m_world->init();
     m_world->generate_all_chunk_meshes();
     m_texture_manager = new TextureManager();
-    init_textures();
+    setuptextures();
     m_gui = new Gui(m_screen->m_window);
     m_shader->setint("texture1", 0);
     m_shader->setint("texture2", 1);
 }
-int MCRFT::Renderer::setup_shaders()
+int MCRFT::Renderer::setupshaders()
 {
     m_shader = new Shader("../rsrc/7.3.camera.vs", "../rsrc/7.3.camera.fs");
     // m_shader = new Shader("../rsrc/model_loading.vs", "../rsrc/model_loading.fs");
     return 0;
 }
-int MCRFT::Renderer::init_textures()
+int MCRFT::Renderer::setuptextures()
 {
-    m_texture_manager->add_texture("../rsrc/64x64_sheet.png");
-    m_texture_manager->add_texture("../rsrc/crosshair.png");
+    m_texture_manager->addtexture("../rsrc/64x64_sheet.png");
+    m_texture_manager->addtexture("../rsrc/crosshair.png");
     return 0;
 }
-int MCRFT::Renderer::_render_crosshair()
+int MCRFT::Renderer::rendercrosshair()
 {
     int error = 0;
     try
@@ -37,11 +37,11 @@ int MCRFT::Renderer::_render_crosshair()
     }
     catch (const std::exception &e)
     {
-        std::cout << "Renderer _render_crosshair(): Exception: " << e.what() << std::endl;
+        std::cout << "Renderer rendercrosshair(): Exception: " << e.what() << std::endl;
     }
     return error;
 }
-int MCRFT::Renderer::render_map_meshes()
+int MCRFT::Renderer::rendermapmeshes()
 {
     int error = 0;
     try
@@ -77,7 +77,7 @@ int MCRFT::Renderer::render_map_meshes()
     }
     catch (const std::exception &e)
     {
-        std::cout << "Renderer render_map_meshes(): Exception: " << e.what() << std::endl;
+        std::cout << "Renderer rendermapmeshes(): Exception: " << e.what() << std::endl;
     }
     return error;
 }
@@ -108,12 +108,12 @@ int MCRFT::Renderer::loop()
             prevTime = crntTime;
             counter = 0;
         }
-        m_camera->update_frame();
+        m_camera->updateframe();
         glm::vec3 copyOfOldCameraPos = m_camera->m_camera_pos;
         glm::vec3 copyOfOldPlayerPos = m_camera->m_curr_player->m_current_pos;
         // input
         // -----
-        m_camera->process_input(m_screen->m_window);
+        m_camera->processinput(m_screen->m_window);
         int curr_x = floor(m_camera->m_curr_player->m_current_pos.x);
         int curr_y = floor(m_camera->m_curr_player->m_current_pos.y);
         int curr_z = floor(m_camera->m_curr_player->m_current_pos.z);
@@ -132,25 +132,25 @@ int MCRFT::Renderer::loop()
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
-        if (!m_texture_manager->get_texture(1))
+        if (!m_texture_manager->gettexture(1))
         {
             continue;
         }
-        glBindTexture(GL_TEXTURE_2D, m_texture_manager->get_texture(1)->m_texture_id);
+        glBindTexture(GL_TEXTURE_2D, m_texture_manager->gettexture(1)->m_texture_id);
 
         // activate shader
         m_shader->use();
-        m_camera->update_shaders_projection_mat(m_shader);
+        m_camera->updateprojmatrix(m_shader);
         if (glfwGetMouseButton(m_screen->m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         {
             this->m_world->cast_ray(m_camera, m_camera->m_curr_player->m_current_pos);
         }
 
         // render boxes
-        this->render_map_meshes();
+        this->rendermapmeshes();
         if (fps_string != nullptr)
         {
-            m_gui->render_frame(fps_string);
+            m_gui->renderframe(fps_string);
         }
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -159,7 +159,7 @@ int MCRFT::Renderer::loop()
     }
     return 0;
 }
-int MCRFT::Renderer::destroy_renderer()
+int MCRFT::Renderer::destroyrenderer()
 {
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------

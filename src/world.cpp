@@ -382,7 +382,7 @@ void MCRFT::World::cast_ray(Camera *camera, glm::vec3 position)
         }
 
         glm::vec3 rayOrigin = camera->m_camera_pos;
-        glm::vec3 rayDirection = camera->get_ray_direction();
+        glm::vec3 rayDirection = camera->getraydirection();
 
         for (float t = 0; t < 5; t += 0.1f)
         {

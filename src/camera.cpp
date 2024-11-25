@@ -37,7 +37,7 @@ MCRFT::Camera::Camera(GLFWwindow *m_window)
         std::cout << "Camera(): Exception: " << e.what() << std::endl;
     }
 }
-void MCRFT::Camera::update_frame()
+void MCRFT::Camera::updateframe()
 {
     // per-frame time logic
     // --------------------
@@ -45,7 +45,7 @@ void MCRFT::Camera::update_frame()
     m_delta_time = current_frame - m_last_frame;
     m_last_frame = current_frame;
 }
-void MCRFT::Camera::update_shaders_projection_mat(Shader *shader)
+void MCRFT::Camera::updateprojmatrix(Shader *shader)
 {
     try
     {
@@ -59,13 +59,13 @@ void MCRFT::Camera::update_shaders_projection_mat(Shader *shader)
     }
     catch (const std::exception &e)
     {
-        std::cout << "Camera update_shaders_projection_mat(): Exception: " << e.what() << std::endl;
+        std::cout << "Camera updateprojmatrix(): Exception: " << e.what() << std::endl;
     }
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void MCRFT::Camera::process_input(GLFWwindow *window)
+void MCRFT::Camera::processinput(GLFWwindow *window)
 {
     try
     {
@@ -116,7 +116,7 @@ void MCRFT::Camera::process_input(GLFWwindow *window)
     }
     catch (const std::exception &e)
     {
-        std::cout << "Camera process_input(): Exception: " << e.what() << std::endl;
+        std::cout << "Camera processinput(): Exception: " << e.what() << std::endl;
     }
 }
 
@@ -185,7 +185,7 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
     }
 }
 
-glm::vec3 MCRFT::Camera::get_ray_direction()
+glm::vec3 MCRFT::Camera::getraydirection()
 {
     return glm::normalize(m_camera_front);
 }

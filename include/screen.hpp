@@ -14,8 +14,8 @@ namespace MCRFT
     class Screen
     {
     public:
-        int init_window();
-        int init_callbacks();
+        int setupwindow();
+        int setupinputcallbacks();
 
         GLFWwindow *m_window;
 

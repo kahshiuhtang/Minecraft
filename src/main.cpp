@@ -5,5 +5,5 @@ int main()
 
     MCRFT::Renderer *renderer = new MCRFT::Renderer();
     renderer->loop();
-    renderer->destroy_renderer();
+    renderer->destroyrenderer();
 }

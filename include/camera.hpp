@@ -18,11 +18,11 @@ namespace MCRFT
 
     public:
         Camera(GLFWwindow *m_window);
-        glm::vec3 get_ray_direction();
-        void process_input(GLFWwindow *window);
-        void update_frame();
-        void update_shaders_projection_mat(Shader *m_shader);
-        glm::mat4 get_viewmatrix()
+        glm::vec3 getraydirection();
+        void processinput(GLFWwindow *window);
+        void updateframe();
+        void updateprojmatrix(Shader *m_shader);
+        glm::mat4 getviewmatrix()
         {
             return glm::lookAt(m_camera_pos, m_camera_pos + m_camera_front, m_camera_up);
         }
