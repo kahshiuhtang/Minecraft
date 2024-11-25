@@ -14,8 +14,8 @@ MCRFT::Renderer::Renderer()
     m_texture_manager = new TextureManager();
     init_textures();
     m_gui = new Gui(m_screen->m_window);
-    m_shader->set_int("texture1", 0);
-    m_shader->set_int("texture2", 1);
+    m_shader->setint("texture1", 0);
+    m_shader->setint("texture2", 1);
 }
 int MCRFT::Renderer::setup_shaders()
 {
@@ -59,7 +59,7 @@ int MCRFT::Renderer::render_map_meshes()
                 }
                 std::vector<float> *vertices = &(chunk->m_mesh_vertices);
                 glm::mat4 model = glm::mat4(1.0f);
-                m_shader->set_mat4("model", model);
+                m_shader->setmat4("model", model);
                 glBindBuffer(GL_ARRAY_BUFFER, p_VBO);
                 glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(float), vertices->data(), GL_STATIC_DRAW);
 
@@ -128,7 +128,7 @@ int MCRFT::Renderer::loop()
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_gui->start_new_frame();
+        m_gui->startnewframe();
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);

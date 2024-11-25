@@ -11,7 +11,7 @@ namespace MCRFT
     {
     public:
         Gui(GLFWwindow *window);
-        void start_new_frame();
+        void startnewframe();
         void render_frame(const char *fps_string);
 
     private:

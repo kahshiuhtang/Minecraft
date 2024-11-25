@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include "renderer/shader.hpp"
+#include "renderer/model.hpp"
 #include "renderer/gui.hpp"
 #include "renderer/texture.hpp"
 #include "world/world.hpp"
