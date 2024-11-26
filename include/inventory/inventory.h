@@ -1,0 +1,4 @@
+#ifndef MCRFT_INVENTORY_HPP
+#define MCRFT_INVENTORY_HPP
+
+#endif

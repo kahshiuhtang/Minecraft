@@ -1,8 +1,10 @@
 #ifndef MCRFT_MODEL_HPP
 #define MCRFT_MODEL_HPP
 
-#include <glad/glad.h> 
+#include <string>
+#include <vector>
 
+#include <glad/glad.h> 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "stb_image.h"
@@ -13,8 +15,6 @@
 #include "renderer/shader.hpp"
 #include "renderer/mesh.hpp"
 
-#include <string>
-#include <vector>
 namespace MCRFT {
 class Model 
 {

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+
 #include "renderer/texture.hpp"
 #include "renderer/vertex.hpp"
 #include "renderer/shader.hpp"

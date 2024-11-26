@@ -1,9 +1,10 @@
 #ifndef MCRFT_SCREEN_HPP
 #define MCRFT_SCREEN_HPP
 
+#include <iostream>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
 
 #include "camera.hpp"
 namespace MCRFT

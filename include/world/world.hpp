@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "PerlinNoise.hpp"
+
 #include "camera.hpp"
 
 #define CHUNK_WIDTH         16
