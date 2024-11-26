@@ -10,7 +10,7 @@ MCRFT::Renderer::Renderer()
     m_shader->use();
     m_world = new World();
     m_world->init();
-    m_world->generate_all_chunk_meshes();
+    m_world->generateallchunkmeshes();
     m_texture_manager = new TextureManager();
     setuptextures();
     m_gui = new Gui(m_screen->m_window);
@@ -117,7 +117,7 @@ int MCRFT::Renderer::loop()
         int curr_x = floor(m_camera->m_curr_player->m_current_pos.x);
         int curr_y = floor(m_camera->m_curr_player->m_current_pos.y);
         int curr_z = floor(m_camera->m_curr_player->m_current_pos.z);
-        if (m_world->isInsideBlock(curr_x, curr_y, curr_z))
+        if (m_world->isinsideblock(curr_x, curr_y, curr_z))
         {
             m_camera->m_camera_pos = copyOfOldCameraPos;
             m_camera->m_curr_player->m_current_pos = copyOfOldPlayerPos;
@@ -143,7 +143,7 @@ int MCRFT::Renderer::loop()
         m_camera->updateprojmatrix(m_shader);
         if (glfwGetMouseButton(m_screen->m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         {
-            this->m_world->cast_ray(m_camera, m_camera->m_curr_player->m_current_pos);
+            this->m_world->castray(m_camera, m_camera->m_curr_player->m_current_pos);
         }
 
         // render boxes

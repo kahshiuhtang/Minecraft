@@ -63,9 +63,9 @@ namespace MCRFT
             std::fill(m_sections.begin(), m_sections.end(), nullptr);
         }
 
-        void initialize_chunk(const siv::PerlinNoise *perlin, unsigned int chunk_x, unsigned int chunk_z, const int chunk_size_x, const int chunk_size_z);
-        void generate_mesh(World *world);
-        bool remove_block(int x, int y, int z);
+        void setup(const siv::PerlinNoise *perlin, unsigned int chunk_x, unsigned int chunk_z, const int chunk_size_x, const int chunk_size_z);
+        void generatesurfacemesh(World *world);
+        bool eraseblock(int x, int y, int z);
 
     private:
     };
@@ -74,11 +74,11 @@ namespace MCRFT
     {
     public:
         void init();
-        bool is_block_occupied(int x, int y, int z);
-        bool generate_all_chunk_meshes();
-        void cast_ray(Camera *camera, glm::vec3 position);
-        bool remove_block(int x, int y, int z);
-        bool isInsideBlock(int x, int y, int z);
+        bool isblockoccupied(int x, int y, int z);
+        bool generateallchunkmeshes();
+        void castray(Camera *camera, glm::vec3 position);
+        bool eraseblock(int x, int y, int z);
+        bool isinsideblock(int x, int y, int z);
         std::shared_ptr<MCRFT::Chunk> get_chunk(int x, int z);
 
         World()

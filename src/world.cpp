@@ -1,7 +1,7 @@
 #include "world/world.hpp"
 #include "iostream"
 
-void AddFace(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction);
+void addblockface(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction);
 
 void MCRFT::World::init()
 {
@@ -16,7 +16,7 @@ void MCRFT::World::init()
             for (unsigned int j = 0; j < 16; j++)
             {
                 auto current_chunk = std::make_shared<Chunk>();
-                current_chunk->initialize_chunk(&perlin, i, j, CHUNK_SIZE_X, CHUNK_SIZE_Z);
+                current_chunk->setup(&perlin, i, j, CHUNK_SIZE_X, CHUNK_SIZE_Z);
                 m_chunks[i][j] = current_chunk;
             }
         }
@@ -27,98 +27,93 @@ void MCRFT::World::init()
     }
 }
 
-bool MCRFT::World::is_block_occupied(int x, int y, int z)
+bool MCRFT::World::isblockoccupied(int x, int y, int z)
 {
-    if (x < 0 || y < 0 || z < 0)
+    if (x < 0 || y < 0 || z < 0 || y >= 384)
     {
         return false;
     }
-    if (y >= 384)
-    {
-        return false;
-    }
+
     unsigned int chunk_x = x / 16;
     unsigned int coord_x_within_chunk = x % 16;
     unsigned int segment = y / 16;
     unsigned int coord_y_within_chunk = y % 16;
     unsigned int chunk_z = z / 16;
     unsigned int coord_z_within_chunk = z % 16;
-    if (chunk_x >= 16 || chunk_x < 0)
+
+    if (chunk_x >= 16 || chunk_z >= 16)
     {
         return false;
     }
-    if (chunk_z >= 16 || chunk_z < 0)
+
+    auto curr_chunk = m_chunks[chunk_x][chunk_z];
+    if (!curr_chunk)
     {
         return false;
     }
-    std::shared_ptr<MCRFT::Chunk> curr_chunk = m_chunks[chunk_x][chunk_z];
-    if (curr_chunk == nullptr)
+
+    auto curr_section = curr_chunk->m_sections[segment];
+    if (!curr_section)
     {
         return false;
     }
-    std::shared_ptr<MCRFT::ChunkSection> curr_section = curr_chunk->m_sections[segment];
-    if (curr_section == nullptr)
+
+    if (coord_x_within_chunk >= 16 || coord_y_within_chunk >= 16 || coord_z_within_chunk >= 16)
     {
         return false;
     }
-    if (coord_x_within_chunk < 0 || coord_x_within_chunk >= 16)
-    {
-        return false;
-    }
-    if (coord_y_within_chunk < 0 || coord_y_within_chunk >= 16)
-    {
-        return false;
-    }
-    if (coord_z_within_chunk < 0 || coord_z_within_chunk >= 16)
-    {
-        return false;
-    }
-    bool ans = !(curr_section->blocks[coord_x_within_chunk][coord_y_within_chunk][coord_z_within_chunk] == nullptr);
-    //if(!ans) std::cout << y << std::endl;
-    return ans;
+
+    return curr_section->blocks[coord_x_within_chunk][coord_y_within_chunk][coord_z_within_chunk] != nullptr;
 }
-void MCRFT::Chunk::initialize_chunk(const siv::PerlinNoise *perlin, unsigned int chunk_x, unsigned int chunk_z, const int chunk_size_x, const int chunk_size_z)
+
+void MCRFT::Chunk::setup(const siv::PerlinNoise *perlin, unsigned int chunk_x, unsigned int chunk_z, 
+                                    const int chunk_size_x, const int chunk_size_z)
 {
     try
     {
-        // for every section, we want to make a new section (should be 24)
-        for (unsigned int i = 0; i < m_sections.size(); i++)
+        for (auto &section : m_sections)
         {
-            auto new_section = std::make_shared<ChunkSection>();
-            m_sections[i] = new_section;
+            section = std::make_shared<ChunkSection>();
         }
+
         m_chunk_x = chunk_x;
         m_chunk_z = chunk_z;
+
         const unsigned int starting_x_coord = chunk_x * chunk_size_x;
         const unsigned int starting_z_coord = chunk_z * chunk_size_z;
-        // for every x, z (16 x 16), we want to get the height at THAT specific x, z
-        for (unsigned int i = 0; i < chunk_size_x; i++)
+        const double noise_scale = 0.01;
+        const double height_multiplier = 100.0;
+        const unsigned int section_height = 16;
+
+        // Generate height map for the chunk
+        for (unsigned int x = 0; x < chunk_size_x; x++)
         {
-            for (unsigned int j = 0; j < chunk_size_z; j++)
+            for (unsigned int z = 0; z < chunk_size_z; z++)
             {
-                double noise = perlin->octave2D_01(((starting_x_coord + i) * 0.01), ((starting_z_coord + j) * 0.01), 4);
-                noise *= 100;
-                const int coordinate_height = static_cast<int>(noise);
-                m_max_height[i][j] = coordinate_height;
+                double noise = perlin->octave2D_01((starting_x_coord + x) * noise_scale, 
+                                                   (starting_z_coord + z) * noise_scale, 4);
+                m_max_height[x][z] = static_cast<int>(noise * height_multiplier);
             }
         }
-        for (unsigned int i = 0; i < m_sections.size(); i++)
+
+        for (unsigned int section_idx = 0; section_idx < m_sections.size(); section_idx++)
         {
-            unsigned int min_height = (i) * 16; // should probably make this 16 a constant
-            auto current_section = m_sections[i];
-            for (unsigned int u = 0; u < 16; u++) // x
+            auto &current_section = m_sections[section_idx];
+            unsigned int min_height = section_idx * section_height;
+
+            for (unsigned int x = 0; x < section_height; x++)
             {
-                for (unsigned int v = 0; v < 16; v++) // y
+                for (unsigned int y = 0; y < section_height; y++)
                 {
-                    for (unsigned int w = 0; w < 16; w++) // z
+                    for (unsigned int z = 0; z < section_height; z++)
                     {
-                        if (min_height + v <= m_max_height[u][w])
+                        if (min_height + y <= m_max_height[x][z])
                         {
-                            current_section->blocks[u][v][w] = std::make_shared<Block>();
+                            current_section->blocks[x][y][z] = std::make_shared<Block>();
                         }
                         else
                         {
-                            current_section->blocks[u][v][w] = nullptr;
+                            current_section->blocks[x][y][z] = nullptr;
                         }
                     }
                 }
@@ -127,10 +122,11 @@ void MCRFT::Chunk::initialize_chunk(const siv::PerlinNoise *perlin, unsigned int
     }
     catch (const std::exception &e)
     {
-        std::cout << "World initialize_chunk(): Exception: " << e.what() << std::endl;
+        std::cerr << "Error in setup(): " << e.what() << std::endl;
     }
 }
-bool MCRFT::World::generate_all_chunk_meshes()
+
+bool MCRFT::World::generateallchunkmeshes()
 {
     bool err = false;
     try
@@ -139,7 +135,7 @@ bool MCRFT::World::generate_all_chunk_meshes()
         {
             for (int j = 0; j < 16; j++)
             {
-                m_chunks[i][j]->generate_mesh(this);
+                m_chunks[i][j]->generatesurfacemesh(this);
             }
         }
     }
@@ -149,13 +145,14 @@ bool MCRFT::World::generate_all_chunk_meshes()
     }
     return err;
 }
-void MCRFT::Chunk::generate_mesh(MCRFT::World *world)
+
+void MCRFT::Chunk::generatesurfacemesh(MCRFT::World *world)
 {
     try
     {
-        if (world == nullptr)
+        if (!world)
         {
-            std::cout << "Chunk generate_mesh(): world is a nullptr" << std::endl;
+            std::cerr << "Chunk generatesurfacemesh(): world is a nullptr" << std::endl;
             return;
         }
         m_mesh_vertices.clear();
@@ -166,36 +163,39 @@ void MCRFT::Chunk::generate_mesh(MCRFT::World *world)
                 int max_height = m_max_height[i][j];
                 for (int k = 0; k <= max_height; k++)
                 {
-                    int y_coord = k;
                     int x_coord = m_chunk_x * 16 + i;
+                    int y_coord = k;
                     int z_coord = m_chunk_z * 16 + j;
-                    if (world->is_block_occupied(x_coord, y_coord, z_coord) == false)
+                    if (!world->isblockoccupied(x_coord, y_coord, z_coord))
                     {
                         continue;
                     }
-                    if (world->is_block_occupied(x_coord + 1, y_coord, z_coord) == false)
+                    const std::vector<MCRFT::Direction> directions = {
+                        MCRFT::Direction::LEFT,
+                        MCRFT::Direction::RIGHT,
+                        MCRFT::Direction::TOP,
+                        MCRFT::Direction::BOTTOM,
+                        MCRFT::Direction::BACK,
+                        MCRFT::Direction::FRONT
+                    };
+                    // Check and add faces for each direction
+                    for (const auto& dir : directions)
                     {
-                        AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::LEFT);
-                    }
-                    if (world->is_block_occupied(x_coord - 1, y_coord, z_coord) == false)
-                    {
-                        AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::RIGHT);
-                    }
-                    if (world->is_block_occupied(x_coord, y_coord + 1, z_coord) == false)
-                    {
-                        AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::TOP);
-                    }
-                    if (world->is_block_occupied(x_coord, y_coord - 1, z_coord) == false)
-                    {
-                        AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::BOTTOM);
-                    }
-                    if (world->is_block_occupied(x_coord, y_coord, z_coord + 1) == false)
-                    {
-                        AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::BACK);
-                    }
-                    if (world->is_block_occupied(x_coord, y_coord, z_coord - 1) == false)
-                    {
-                        AddFace(&m_mesh_vertices, x_coord, y_coord, z_coord, MCRFT::Direction::FRONT);
+                        int dx = 0, dy = 0, dz = 0;
+                        switch (dir)
+                        {
+                            case MCRFT::Direction::LEFT:   dx = 1; break;
+                            case MCRFT::Direction::RIGHT:  dx = -1; break;
+                            case MCRFT::Direction::TOP:    dy = 1; break;
+                            case MCRFT::Direction::BOTTOM: dy = -1; break;
+                            case MCRFT::Direction::BACK:   dz = 1; break;
+                            case MCRFT::Direction::FRONT:  dz = -1; break;
+                        }
+                        // If the adjacent block is not occupied, add face
+                        if (!world->isblockoccupied(x_coord + dx, y_coord + dy, z_coord + dz))
+                        {
+                            addblockface(&m_mesh_vertices, x_coord, y_coord, z_coord, dir);
+                        }
                     }
                 }
             }
@@ -203,10 +203,10 @@ void MCRFT::Chunk::generate_mesh(MCRFT::World *world)
     }
     catch (const std::exception &e)
     {
-        std::cout << "Chunk generate_mesh(): Exception: " << e.what() << std::endl;
+        std::cerr << "Chunk generatesurfacemesh(): Exception: " << e.what() << std::endl;
     }
 }
-void AddFace(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction)
+void addblockface(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction)
 {
     float sides_left_x = (0.0 * 16.0) / 256.0;
     float sides_right_x = (1.0 * 16.0) / 256.0;
@@ -295,15 +295,15 @@ void AddFace(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction
         vertices->push_back(z);
     }
 }
-bool MCRFT::World::isInsideBlock(int x, int y, int z)
+bool MCRFT::World::isinsideblock(int x, int y, int z)
 {
     bool res = false;
-    res = res || this->is_block_occupied(x + 1, y, z);
-    res = res || this->is_block_occupied(x, y, z + 1);
-    res = res || this->is_block_occupied(x + 1, y, z + 1);
-    res = res || this->is_block_occupied(x + 1, y + 1, z);
-    res = res || this->is_block_occupied(x, y + 1, z + 1);
-    res = res || this->is_block_occupied(x + 1, y + 1, z + 1);
+    res = res || this->isblockoccupied(x + 1, y, z);
+    res = res || this->isblockoccupied(x, y, z + 1);
+    res = res || this->isblockoccupied(x + 1, y, z + 1);
+    res = res || this->isblockoccupied(x + 1, y + 1, z);
+    res = res || this->isblockoccupied(x, y + 1, z + 1);
+    res = res || this->isblockoccupied(x + 1, y + 1, z + 1);
     return res;
 }
 std::shared_ptr<MCRFT::Chunk> MCRFT::World::get_chunk(int x, int z)
@@ -322,10 +322,10 @@ std::shared_ptr<MCRFT::Chunk> MCRFT::World::get_chunk(int x, int z)
     }
     catch (const std::exception &e)
     {
-        std::cout << "Chunk generate_mesh(): Exception: " << e.what() << std::endl;
+        std::cout << "Chunk getchunk(): Exception: " << e.what() << std::endl;
     }
 }
-bool MCRFT::Chunk::remove_block(int x, int y, int z)
+bool MCRFT::Chunk::eraseblock(int x, int y, int z)
 {
     bool result = false;
     try
@@ -345,11 +345,11 @@ bool MCRFT::Chunk::remove_block(int x, int y, int z)
     }
     catch (const std::exception &e)
     {
-        std::cout << "Chunk remove_block(): Exception: " << e.what() << std::endl;
+        std::cout << "Chunk eraseblock(): Exception: " << e.what() << std::endl;
     }
     return result;
 }
-bool MCRFT::World::remove_block(int x, int y, int z)
+bool MCRFT::World::eraseblock(int x, int y, int z)
 {
     bool result = false;
     try
@@ -359,10 +359,10 @@ bool MCRFT::World::remove_block(int x, int y, int z)
         {
             return result;
         }
-        result = curr_chunk->remove_block(x, y, z);
+        result = curr_chunk->eraseblock(x, y, z);
         if (result)
         {
-            curr_chunk->generate_mesh(this);
+            curr_chunk->generatesurfacemesh(this);
         }
         else
         {
@@ -371,11 +371,11 @@ bool MCRFT::World::remove_block(int x, int y, int z)
     }
     catch (const std::exception &e)
     {
-        std::cout << "Chunk remove_block(): Exception: " << e.what() << std::endl;
+        std::cout << "Chunk eraseblock(): Exception: " << e.what() << std::endl;
     }
     return result;
 }
-void MCRFT::World::cast_ray(Camera *camera, glm::vec3 position)
+void MCRFT::World::castray(Camera *camera, glm::vec3 position)
 {
     try
     {
@@ -390,17 +390,15 @@ void MCRFT::World::cast_ray(Camera *camera, glm::vec3 position)
         for (float t = 0; t < 5; t += 0.1f)
         {
             glm::vec3 currentPos = rayOrigin + t * rayDirection;
-
-            // Check if currentPos is inside a block
-            if (this->is_block_occupied(floor(currentPos.x), floor(currentPos.y), floor(currentPos.z)))
+            if (this->isblockoccupied(floor(currentPos.x), floor(currentPos.y), floor(currentPos.z)))
             {
-                this->remove_block(floor(currentPos.x), floor(currentPos.y), floor(currentPos.z));
+                this->eraseblock(floor(currentPos.x), floor(currentPos.y), floor(currentPos.z));
                 return;
             }
         }
     }
     catch (const std::exception &e)
     {
-        std::cout << "Chunk cast_ray(): Exception: " << e.what() << std::endl;
+        std::cout << "Chunk castray(): Exception: " << e.what() << std::endl;
     }
 }
