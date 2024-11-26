@@ -52,7 +52,7 @@ int MCRFT::Renderer::rendermapmeshes()
             {
 
                 glBindVertexArray(p_VAO);
-                Chunk *chunk = m_world->get_chunk(i, j);
+                std::shared_ptr<MCRFT::Chunk> chunk = m_world->get_chunk(i, j);
                 if (chunk == nullptr)
                 {
                     continue;

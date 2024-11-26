@@ -15,7 +15,7 @@ void MCRFT::World::init()
         {
             for (unsigned int j = 0; j < 16; j++)
             {
-                Chunk *current_chunk = new Chunk();
+                auto current_chunk = std::make_shared<Chunk>();
                 current_chunk->initialize_chunk(&perlin, i, j, CHUNK_SIZE_X, CHUNK_SIZE_Z);
                 m_chunks[i][j] = current_chunk;
             }
@@ -51,13 +51,13 @@ bool MCRFT::World::is_block_occupied(int x, int y, int z)
     {
         return false;
     }
-    Chunk *curr_chunk = m_chunks[chunk_x][chunk_z];
-    if (curr_chunk == nullptr || curr_chunk->m_sections == nullptr)
+    std::shared_ptr<MCRFT::Chunk> curr_chunk = m_chunks[chunk_x][chunk_z];
+    if (curr_chunk == nullptr)
     {
         return false;
     }
-    ChunkSection *curr_section = curr_chunk->m_sections[segment];
-    if (curr_section == nullptr || curr_section->blocks == nullptr)
+    std::shared_ptr<MCRFT::ChunkSection> curr_section = curr_chunk->m_sections[segment];
+    if (curr_section == nullptr)
     {
         return false;
     }
@@ -73,16 +73,18 @@ bool MCRFT::World::is_block_occupied(int x, int y, int z)
     {
         return false;
     }
-    return !(curr_section->blocks[coord_x_within_chunk][coord_y_within_chunk][coord_z_within_chunk] == nullptr);
+    bool ans = !(curr_section->blocks[coord_x_within_chunk][coord_y_within_chunk][coord_z_within_chunk] == nullptr);
+    //if(!ans) std::cout << y << std::endl;
+    return ans;
 }
 void MCRFT::Chunk::initialize_chunk(const siv::PerlinNoise *perlin, unsigned int chunk_x, unsigned int chunk_z, const int chunk_size_x, const int chunk_size_z)
 {
     try
     {
         // for every section, we want to make a new section (should be 24)
-        for (unsigned int i = 0; i < sizeof(m_sections) / sizeof(m_sections[0]); i++)
+        for (unsigned int i = 0; i < m_sections.size(); i++)
         {
-            ChunkSection *new_section = new ChunkSection();
+            auto new_section = std::make_shared<ChunkSection>();
             m_sections[i] = new_section;
         }
         m_chunk_x = chunk_x;
@@ -100,10 +102,10 @@ void MCRFT::Chunk::initialize_chunk(const siv::PerlinNoise *perlin, unsigned int
                 m_max_height[i][j] = coordinate_height;
             }
         }
-        for (unsigned int i = 0; i < sizeof(m_sections) / sizeof(m_sections[0]); i++)
+        for (unsigned int i = 0; i < m_sections.size(); i++)
         {
             unsigned int min_height = (i) * 16; // should probably make this 16 a constant
-            ChunkSection *current_section = m_sections[i];
+            auto current_section = m_sections[i];
             for (unsigned int u = 0; u < 16; u++) // x
             {
                 for (unsigned int v = 0; v < 16; v++) // y
@@ -112,7 +114,7 @@ void MCRFT::Chunk::initialize_chunk(const siv::PerlinNoise *perlin, unsigned int
                     {
                         if (min_height + v <= m_max_height[u][w])
                         {
-                            current_section->blocks[u][v][w] = new Block();
+                            current_section->blocks[u][v][w] = std::make_shared<Block>();
                         }
                         else
                         {
@@ -304,7 +306,7 @@ bool MCRFT::World::isInsideBlock(int x, int y, int z)
     res = res || this->is_block_occupied(x + 1, y + 1, z + 1);
     return res;
 }
-MCRFT::Chunk *MCRFT::World::get_chunk(int x, int z)
+std::shared_ptr<MCRFT::Chunk> MCRFT::World::get_chunk(int x, int z)
 {
     try
     {
@@ -332,10 +334,12 @@ bool MCRFT::Chunk::remove_block(int x, int y, int z)
         int block_x = x - (16 * m_chunk_x);
         int block_y = y % 16;
         int block_z = z - (16 * m_chunk_z);
-        if (m_sections[chunk_segment] != nullptr && m_sections[chunk_segment]->blocks[block_x][block_y][block_z] != nullptr)
+
+        if (m_sections[chunk_segment] != nullptr &&
+            m_sections[chunk_segment]->blocks[block_x][block_y][block_z] != nullptr)
         {
-            free(m_sections[chunk_segment]->blocks[block_x][block_y][block_z]);
-            m_sections[chunk_segment]->blocks[block_x][block_y][block_z] = nullptr;
+            // Reset the smart pointer to release ownership of the block
+            m_sections[chunk_segment]->blocks[block_x][block_y][block_z].reset();
             result = true;
         }
     }
@@ -350,8 +354,7 @@ bool MCRFT::World::remove_block(int x, int y, int z)
     bool result = false;
     try
     {
-        Chunk *curr_chunk = this->get_chunk(floor(x / 16), floor(z / 16));
-        std::cout << "TX: " << x << " TY: " << y << " TZ: " << z << std::endl;
+        std::shared_ptr<MCRFT::Chunk> curr_chunk = this->get_chunk(floor(x / 16), floor(z / 16));
         if (curr_chunk == nullptr)
         {
             return result;
