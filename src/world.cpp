@@ -3,7 +3,7 @@
 
 void addblockface(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction);
 
-void MCRFT::World::init()
+void MCRFT::World::createnew()
 {
     try
     {
@@ -34,14 +34,14 @@ bool MCRFT::World::isblockoccupied(int x, int y, int z)
         return false;
     }
 
-    unsigned int chunk_x = x / 16;
-    unsigned int coord_x_within_chunk = x % 16;
-    unsigned int segment = y / 16;
-    unsigned int coord_y_within_chunk = y % 16;
-    unsigned int chunk_z = z / 16;
-    unsigned int coord_z_within_chunk = z % 16;
+    unsigned int chunk_x = x / CHUNK_LENGTH;
+    unsigned int coord_x_within_chunk = x % CHUNK_LENGTH;
+    unsigned int segment = y / CHUNK_HEIGHT;
+    unsigned int coord_y_within_chunk = y % CHUNK_HEIGHT;
+    unsigned int chunk_z = z / CHUNK_WIDTH;
+    unsigned int coord_z_within_chunk = z % CHUNK_WIDTH;
 
-    if (chunk_x >= 16 || chunk_z >= 16)
+    if (chunk_x >= CHUNK_LENGTH || chunk_z >= CHUNK_WIDTH)
     {
         return false;
     }
@@ -58,7 +58,7 @@ bool MCRFT::World::isblockoccupied(int x, int y, int z)
         return false;
     }
 
-    if (coord_x_within_chunk >= 16 || coord_y_within_chunk >= 16 || coord_z_within_chunk >= 16)
+    if (coord_x_within_chunk >= CHUNK_LENGTH || coord_y_within_chunk >= CHUNK_HEIGHT || coord_z_within_chunk >= CHUNK_WIDTH)
     {
         return false;
     }
@@ -83,7 +83,7 @@ void MCRFT::Chunk::setup(const siv::PerlinNoise *perlin, unsigned int chunk_x, u
         const unsigned int starting_z_coord = chunk_z * chunk_size_z;
         const double noise_scale = 0.01;
         const double height_multiplier = 100.0;
-        const unsigned int section_height = 16;
+        const unsigned int section_height = CHUNK_HEIGHT;
 
         // Generate height map for the chunk
         for (unsigned int x = 0; x < chunk_size_x; x++)
@@ -156,9 +156,9 @@ void MCRFT::Chunk::generatesurfacemesh(MCRFT::World *world)
             return;
         }
         m_mesh_vertices.clear();
-        for (unsigned int i = 0; i < 16; i++)
+        for (unsigned int i = 0; i < CHUNK_WIDTH; i++)
         {
-            for (unsigned int j = 0; j < 16; j++)
+            for (unsigned int j = 0; j < CHUNK_LENGTH; j++)
             {
                 int max_height = m_max_height[i][j];
                 for (int k = 0; k <= max_height; k++)
@@ -310,11 +310,11 @@ std::shared_ptr<MCRFT::Chunk> MCRFT::World::get_chunk(int x, int z)
 {
     try
     {
-        if (x < 0 || x >= 16)
+        if (x < 0 || x >= CHUNK_LENGTH)
         {
             return nullptr;
         }
-        if (z < 0 || z >= 16)
+        if (z < 0 || z >= CHUNK_WIDTH)
         {
             return nullptr;
         }
@@ -330,10 +330,10 @@ bool MCRFT::Chunk::eraseblock(int x, int y, int z)
     bool result = false;
     try
     {
-        int chunk_segment = floor(y / 16);
-        int block_x = x - (16 * m_chunk_x);
-        int block_y = y % 16;
-        int block_z = z - (16 * m_chunk_z);
+        int chunk_segment = floor(y / CHUNK_HEIGHT);
+        int block_x = x - (CHUNK_LENGTH * m_chunk_x);
+        int block_y = y % CHUNK_HEIGHT;
+        int block_z = z - (CHUNK_WIDTH * m_chunk_z);
 
         if (m_sections[chunk_segment] != nullptr &&
             m_sections[chunk_segment]->blocks[block_x][block_y][block_z] != nullptr)
@@ -354,7 +354,7 @@ bool MCRFT::World::eraseblock(int x, int y, int z)
     bool result = false;
     try
     {
-        std::shared_ptr<MCRFT::Chunk> curr_chunk = this->get_chunk(floor(x / 16), floor(z / 16));
+        std::shared_ptr<MCRFT::Chunk> curr_chunk = this->get_chunk(floor(x / CHUNK_LENGTH), floor(z / CHUNK_HEIGHT));
         if (curr_chunk == nullptr)
         {
             return result;

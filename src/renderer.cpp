@@ -9,7 +9,7 @@ MCRFT::Renderer::Renderer()
     setupshaders();
     m_shader->use();
     m_world = new World();
-    m_world->init();
+    m_world->createnew();
     m_world->generateallchunkmeshes();
     m_texture_manager = new TextureManager();
     setuptextures();
@@ -46,9 +46,9 @@ int MCRFT::Renderer::rendermapmeshes()
     int error = 0;
     try
     {
-        for (unsigned int i = 0; i < 16; i++)
+        for (unsigned int i = 0; i < CHUNK_LENGTH; i++)
         {
-            for (unsigned int j = 0; j < 16; j++)
+            for (unsigned int j = 0; j < CHUNK_WIDTH; j++)
             {
 
                 glBindVertexArray(p_VAO);

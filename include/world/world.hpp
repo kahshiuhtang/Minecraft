@@ -3,10 +3,17 @@
 
 #include <vector>
 #include <memory>
-#include <algorithm> // For std::fill
+#include <algorithm>
+#include <fstream>
+#include <iostream>
 
 #include "PerlinNoise.hpp"
 #include "camera.hpp"
+
+#define CHUNK_WIDTH         16
+#define CHUNK_LENGTH        16
+#define CHUNK_HEIGHT        16
+#define SECTIONS_PER_CHUNK  24
 
 namespace MCRFT
 {
@@ -35,9 +42,9 @@ namespace MCRFT
         std::vector<std::vector<std::vector<uint8_t>>> skyLight;
 
         ChunkSection()
-            : blocks(16, std::vector<std::vector<std::shared_ptr<Block>>>(16, std::vector<std::shared_ptr<Block>>(16))),
-              blockLight(16, std::vector<std::vector<uint8_t>>(16, std::vector<uint8_t>(16))),
-              skyLight(16, std::vector<std::vector<uint8_t>>(16, std::vector<uint8_t>(16)))
+            : blocks(CHUNK_LENGTH, std::vector<std::vector<std::shared_ptr<Block>>>(CHUNK_WIDTH, std::vector<std::shared_ptr<Block>>(CHUNK_HEIGHT))),
+              blockLight(CHUNK_LENGTH, std::vector<std::vector<uint8_t>>(CHUNK_WIDTH, std::vector<uint8_t>(CHUNK_HEIGHT))),
+              skyLight(CHUNK_LENGTH, std::vector<std::vector<uint8_t>>(CHUNK_WIDTH, std::vector<uint8_t>(CHUNK_HEIGHT)))
         {
             // Initialize all shared pointers to nullptr
             for (auto &plane : blocks)
@@ -56,8 +63,8 @@ namespace MCRFT
         std::vector<float> m_mesh_vertices;
 
         Chunk()
-            : m_sections(24),
-              m_max_height(16, std::vector<int>(16, 0))
+            : m_sections(SECTIONS_PER_CHUNK),
+              m_max_height(CHUNK_LENGTH, std::vector<int>(CHUNK_WIDTH, 0))
         {
             // Initialize all shared pointers to nullptr
             std::fill(m_sections.begin(), m_sections.end(), nullptr);
@@ -73,7 +80,7 @@ namespace MCRFT
     class World
     {
     public:
-        void init();
+        void createnew();
         bool isblockoccupied(int x, int y, int z);
         bool generateallchunkmeshes();
         void castray(Camera *camera, glm::vec3 position);
@@ -82,7 +89,7 @@ namespace MCRFT
         std::shared_ptr<MCRFT::Chunk> get_chunk(int x, int z);
 
         World()
-            : m_chunks(16, std::vector<std::shared_ptr<Chunk>>(16))
+            : m_chunks(CHUNK_LENGTH, std::vector<std::shared_ptr<Chunk>>(CHUNK_WIDTH))
         {
         }
 
