@@ -20,7 +20,7 @@ namespace MCRFT
         glm::vec3 getraydirection();
         void processinput(GLFWwindow *window);
         void updateframe();
-        void updateprojmatrix(Shader *m_shader);
+        void updateprojmatrix(std::shared_ptr<MCRFT::Shader> shader);
         glm::mat4 getviewmatrix()
         {
             return glm::lookAt(m_camera_pos, m_camera_pos + m_camera_front, m_camera_up);

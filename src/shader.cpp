@@ -73,6 +73,7 @@ unsigned int MCRFT::ShaderManager::addshader(const char *vertexpath, const char 
 	if(m_shaders.find(newshader->id) == m_shaders.end())
 	{
 		m_shaders[newshader->id] = newshader;
+		return newshader->id;
 	}
 	return 0;
 }

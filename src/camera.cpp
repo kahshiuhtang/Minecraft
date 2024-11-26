@@ -45,7 +45,7 @@ void MCRFT::Camera::updateframe()
     m_delta_time = current_frame - m_last_frame;
     m_last_frame = current_frame;
 }
-void MCRFT::Camera::updateprojmatrix(Shader *shader)
+void MCRFT::Camera::updateprojmatrix(std::shared_ptr<MCRFT::Shader> shader)
 {
     try
     {

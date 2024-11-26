@@ -7,20 +7,21 @@ MCRFT::Renderer::Renderer()
     m_screen->setupwindow();
     m_camera = new Camera(m_screen->m_window);
     setupshaders();
-    m_shader->use();
+    m_curr_shader->use();
     m_world = new World();
     m_world->createnew();
     m_world->generateallchunkmeshes();
     m_texture_manager = new TextureManager();
     setuptextures();
     m_gui = new Gui(m_screen->m_window);
-    m_shader->setint("texture1", 0);
-    m_shader->setint("texture2", 1);
+    m_curr_shader->setint("texture1", 0);
+    m_curr_shader->setint("texture2", 1);
 }
 int MCRFT::Renderer::setupshaders()
 {
-    m_shader = new Shader("../rsrc/7.3.camera.vs", "../rsrc/7.3.camera.fs");
-    // m_shader = new Shader("../rsrc/model_loading.vs", "../rsrc/model_loading.fs");
+    unsigned int shaderid = m_shader_mang.addshader("../rsrc/7.3.camera.vs", "../rsrc/7.3.camera.fs");
+    m_curr_shader = m_shader_mang.getshader(shaderid);
+    // m_curr_shader = new Shader("../rsrc/model_loading.vs", "../rsrc/model_loading.fs");
     return 0;
 }
 int MCRFT::Renderer::setuptextures()
@@ -59,7 +60,7 @@ int MCRFT::Renderer::rendermapmeshes()
                 }
                 std::vector<float> *vertices = &(chunk->m_mesh_vertices);
                 glm::mat4 model = glm::mat4(1.0f);
-                m_shader->setmat4("model", model);
+                m_curr_shader->setmat4("model", model);
                 glBindBuffer(GL_ARRAY_BUFFER, p_VBO);
                 glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(float), vertices->data(), GL_STATIC_DRAW);
 
@@ -139,8 +140,8 @@ int MCRFT::Renderer::loop()
         glBindTexture(GL_TEXTURE_2D, m_texture_manager->gettexture(1)->m_texture_id);
 
         // activate shader
-        m_shader->use();
-        m_camera->updateprojmatrix(m_shader);
+        m_curr_shader->use();
+        m_camera->updateprojmatrix(m_curr_shader);
         if (glfwGetMouseButton(m_screen->m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         {
             this->m_world->castray(m_camera, m_camera->m_curr_player->m_current_pos);

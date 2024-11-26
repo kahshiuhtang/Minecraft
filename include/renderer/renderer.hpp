@@ -2,6 +2,7 @@
 #define MCRFT_RENDERER_HPP
 
 #include <filesystem>
+#include <memory>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -28,7 +29,8 @@ namespace MCRFT
         int setupshaders();
 
     private:
-        Shader *m_shader;
+        MCRFT::ShaderManager m_shader_mang;
+        std::shared_ptr<MCRFT::Shader> m_curr_shader;
         Camera *m_camera;
         Screen *m_screen;
         World *m_world;
