@@ -19,7 +19,7 @@ MCRFT::Renderer::Renderer()
 }
 int MCRFT::Renderer::setupshaders()
 {
-    norm_shader = m_shader_mang.addshader("../rsrc/7.3.camera.vs", "../rsrc/7.3.camera.fs");
+    norm_shader = m_shader_mang.addshader("../rsrc/block.vs", "../rsrc/block.fs");
     m_curr_shader = m_shader_mang.getshader(norm_shader);
     crosshair_shader = m_shader_mang.addshader("../rsrc/line.vs", "../rsrc/line.fs");
     // m_curr_shader = new Shader("../rsrc/model_loading.vs", "../rsrc/model_loading.fs");
