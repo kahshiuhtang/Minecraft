@@ -82,7 +82,7 @@ namespace MCRFT
         bool eraseblock(int x, int y, int z);
         bool isinsideblock(int x, int y, int z);
         std::shared_ptr<MCRFT::Chunk> getchunk(int x, int z);
-
+        void addblockface(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction, int blockid);
         World()
             : m_chunks(CHUNK_LENGTH, std::vector<std::shared_ptr<Chunk>>(CHUNK_WIDTH))
         {
@@ -93,6 +93,8 @@ namespace MCRFT
         const int CHUNK_SIZE_X = 16;
         const int CHUNK_SIZE_Y = 384;
         const int CHUNK_SIZE_Z = 16;
+        const float BLOCK_SIZE_PIXEL_DIM = 64.0;
+        const float PIXEL_PIC_WIDTH = 3048.0;
         std::vector<std::vector<std::shared_ptr<Chunk>>> m_chunks;
         MCRFT::BlockManager m_blockmanager;
     };

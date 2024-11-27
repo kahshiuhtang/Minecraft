@@ -1,7 +1,6 @@
 #include "world/world.hpp"
 #include "iostream"
 
-void addblockface(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction);
 
 void MCRFT::World::createnew()
 {
@@ -194,7 +193,7 @@ void MCRFT::Chunk::generatesurfacemesh(MCRFT::World *world)
                         // If the adjacent block is not occupied, add face
                         if (!world->isblockoccupied(x_coord + dx, y_coord + dy, z_coord + dz))
                         {
-                            addblockface(&m_mesh_vertices, x_coord, y_coord, z_coord, dir);
+                            world->addblockface(&m_mesh_vertices, x_coord, y_coord, z_coord, dir, 1);
                         }
                     }
                 }
@@ -206,108 +205,63 @@ void MCRFT::Chunk::generatesurfacemesh(MCRFT::World *world)
         std::cerr << "Chunk generatesurfacemesh(): Exception: " << e.what() << std::endl;
     }
 }
-void addblockface(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction)
+void MCRFT::World::addblockface(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction, int blockid)
 {
-    const float GRASS_SIDE_LEFT = (2.0 * 64.0) / 3048.0;
-    const float GRASS_SIDE_RIGHT = (3.0 * 64.0) / 3048.0;
-    const float GRASS_TOP_LEFT = (0.0 * 64.0) / 3048.0;
-    const float GRASS_TOP_RIGHT = (1.0 * 64.0) / 3048.0;
-    const float GRASS_BOTTOM_LEFT = (1.0 * 64.0) / 3048.0;
-    const float GRASS_BOTTOM_RIGHT = (2.0 * 64.0) / 3048.0;
+    auto blocktype = m_blockmanager.getblockinfo(blockid);
+    if(blocktype == nullptr){
+        std::cout << "addblockface: blocktype is nullptr" << std::endl;
+        throw std::runtime_error("blocktype is invalid");
+    }
+
+    const float SIDE_LEFT = (blocktype->m_sidebounds.first * BLOCK_SIZE_PIXEL_DIM) / PIXEL_PIC_WIDTH;
+    const float SIDE_RIGHT = (blocktype->m_sidebounds.second * BLOCK_SIZE_PIXEL_DIM) / PIXEL_PIC_WIDTH;
+    const float TOP_LEFT = (blocktype->m_topbounds.first * BLOCK_SIZE_PIXEL_DIM) / PIXEL_PIC_WIDTH;
+    const float TOP_RIGHT = (blocktype->m_topbounds.second* BLOCK_SIZE_PIXEL_DIM) / PIXEL_PIC_WIDTH;
+    const float BOTTOM_LEFT = (blocktype->m_bottombounds.first * BLOCK_SIZE_PIXEL_DIM) / PIXEL_PIC_WIDTH;
+    const float BOTTOM_RIGHT = (blocktype->m_bottombounds.second * BLOCK_SIZE_PIXEL_DIM) / PIXEL_PIC_WIDTH;
     float VOXEL_VERTICES[] = {
         // front
-        -0.5f, -0.5f, -0.5f, GRASS_SIDE_RIGHT, 1.0f,
-        0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, 1.0f,
-        0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, 0.0f,
-        0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, 0.0f,
-        -0.5f, 0.5f, -0.5f, GRASS_SIDE_RIGHT, 0.0f,
-        -0.5f, -0.5f, -0.5f, GRASS_SIDE_RIGHT, 1.0f,
+        -0.5f, -0.5f, -0.5f, SIDE_RIGHT, 1.0f,
+        0.5f, -0.5f, -0.5f, SIDE_LEFT, 1.0f,
+        0.5f, 0.5f, -0.5f, SIDE_LEFT, 0.0f,
+        0.5f, 0.5f, -0.5f, SIDE_LEFT, 0.0f,
+        -0.5f, 0.5f, -0.5f, SIDE_RIGHT, 0.0f,
+        -0.5f, -0.5f, -0.5f, SIDE_RIGHT, 1.0f,
         // back
-        -0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, 1.0f,
-        0.5f, -0.5f, 0.5f, GRASS_SIDE_LEFT, 1.0f,
-        0.5f, 0.5f, 0.5f, GRASS_SIDE_LEFT, 0.0f,
-        0.5f, 0.5f, 0.5f, GRASS_SIDE_LEFT, 0.0f,
-        -0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, 0.0f,
-        -0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, 1.0f,
+        -0.5f, -0.5f, 0.5f, SIDE_RIGHT, 1.0f,
+        0.5f, -0.5f, 0.5f, SIDE_LEFT, 1.0f,
+        0.5f, 0.5f, 0.5f, SIDE_LEFT, 0.0f,
+        0.5f, 0.5f, 0.5f, SIDE_LEFT, 0.0f,
+        -0.5f, 0.5f, 0.5f, SIDE_RIGHT, 0.0f,
+        -0.5f, -0.5f, 0.5f, SIDE_RIGHT, 1.0f,
         // right
-        -0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, 0.0f,
-        -0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, 0.0f,
-        -0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, 1.0f,
-        -0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, 1.0f,
-        -0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, 1.0f,
-        -0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, 0.0f,
+        -0.5f, 0.5f, 0.5f, SIDE_RIGHT, 0.0f,
+        -0.5f, 0.5f, -0.5f, SIDE_LEFT, 0.0f,
+        -0.5f, -0.5f, -0.5f, SIDE_LEFT, 1.0f,
+        -0.5f, -0.5f, -0.5f, SIDE_LEFT, 1.0f,
+        -0.5f, -0.5f, 0.5f, SIDE_RIGHT, 1.0f,
+        -0.5f, 0.5f, 0.5f, SIDE_RIGHT, 0.0f,
         // left
-        0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, 0.0f,
-        0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, 0.0f,
-        0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, 1.0f,
-        0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, 1.0f,
-        0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, 1.0f,
-        0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, 0.0f,
+        0.5f, 0.5f, 0.5f, SIDE_RIGHT, 0.0f,
+        0.5f, 0.5f, -0.5f, SIDE_LEFT, 0.0f,
+        0.5f, -0.5f, -0.5f, SIDE_LEFT, 1.0f,
+        0.5f, -0.5f, -0.5f, SIDE_LEFT, 1.0f,
+        0.5f, -0.5f, 0.5f, SIDE_RIGHT, 1.0f,
+        0.5f, 0.5f, 0.5f, SIDE_RIGHT, 0.0f,
         // bottom
-        -0.5f, -0.5f, -0.5f, GRASS_BOTTOM_LEFT, 1.0f,
-        0.5f, -0.5f, -0.5f, GRASS_BOTTOM_RIGHT, 1.0f,
-        0.5f, -0.5f, 0.5f, GRASS_BOTTOM_RIGHT, 0.0f,
-        0.5f, -0.5f, 0.5f, GRASS_BOTTOM_RIGHT, 0.0f,
-        -0.5f, -0.5f, 0.5f, GRASS_BOTTOM_LEFT, 0.0f,
-        -0.5f, -0.5f, -0.5f, GRASS_BOTTOM_LEFT, 1.0f,
+        -0.5f, -0.5f, -0.5f, BOTTOM_LEFT, 1.0f,
+        0.5f, -0.5f, -0.5f, BOTTOM_RIGHT, 1.0f,
+        0.5f, -0.5f, 0.5f, BOTTOM_RIGHT, 0.0f,
+        0.5f, -0.5f, 0.5f, BOTTOM_RIGHT, 0.0f,
+        -0.5f, -0.5f, 0.5f, BOTTOM_LEFT, 0.0f,
+        -0.5f, -0.5f, -0.5f, BOTTOM_LEFT, 1.0f,
         // top
-        -0.5f, 0.5f, -0.5f, GRASS_TOP_LEFT, 1.0f,
-        0.5f, 0.5f, -0.5f, GRASS_TOP_RIGHT, 1.0f,
-        0.5f, 0.5f, 0.5f, GRASS_TOP_RIGHT, 0.0f,
-        0.5f, 0.5f, 0.5f, GRASS_TOP_RIGHT, 0.0f,
-        -0.5f, 0.5f, 0.5f, GRASS_TOP_LEFT, 0.0f,
-        -0.5f, 0.5f, -0.5f, GRASS_TOP_LEFT, 1.0f};
-    // const float GRASS_SIDE_LEFT = (4.0 * 64.0) / 3048.0;
-    // const float GRASS_SIDE_RIGHT = (5.0 * 64.0) / 3048.0;
-    // const float GRASS_TOP_LEFT = (4.0 * 64.0) / 3048.0;
-    // const float GRASS_TOP_RIGHT = (5.0 * 64.0) / 3048.0;
-    // const float GRASS_BOTTOM_LEFT = (4.0 * 64.0) / 3048.0;
-    // const float GRASS_BOTTOM_RIGHT = (5.0 * 64.0) / 3048.0;
-    // const float RIGHT_BOUND_X = 1.0f;
-    // const float LEFT_BOUND_X = 0.0f;
-    // float VOXEL_VERTICES[] = {
-    //     // front
-    //     -0.5f, -0.5f, -0.5f, GRASS_SIDE_RIGHT, RIGHT_BOUND_X,
-    //     0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, RIGHT_BOUND_X,
-    //     0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, LEFT_BOUND_X,
-    //     0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, LEFT_BOUND_X,
-    //     -0.5f, 0.5f, -0.5f, GRASS_SIDE_RIGHT, LEFT_BOUND_X,
-    //     -0.5f, -0.5f, -0.5f, GRASS_SIDE_RIGHT, RIGHT_BOUND_X,
-    //     // back
-    //     -0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, RIGHT_BOUND_X,
-    //     0.5f, -0.5f, 0.5f, GRASS_SIDE_LEFT, RIGHT_BOUND_X,
-    //     0.5f, 0.5f, 0.5f, GRASS_SIDE_LEFT, LEFT_BOUND_X,
-    //     0.5f, 0.5f, 0.5f, GRASS_SIDE_LEFT, LEFT_BOUND_X,
-    //     -0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, LEFT_BOUND_X,
-    //     -0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, RIGHT_BOUND_X,
-    //     // right
-    //     -0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, LEFT_BOUND_X,
-    //     -0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, LEFT_BOUND_X,
-    //     -0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, RIGHT_BOUND_X,
-    //     -0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, RIGHT_BOUND_X,
-    //     -0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, RIGHT_BOUND_X,
-    //     -0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, LEFT_BOUND_X,
-    //     // left
-    //     0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, LEFT_BOUND_X,
-    //     0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, LEFT_BOUND_X,
-    //     0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, RIGHT_BOUND_X,
-    //     0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, RIGHT_BOUND_X,
-    //     0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, RIGHT_BOUND_X,
-    //     0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, LEFT_BOUND_X,
-    //     // bottom
-    //     -0.5f, -0.5f, -0.5f, GRASS_BOTTOM_LEFT, RIGHT_BOUND_X,
-    //     0.5f, -0.5f, -0.5f, GRASS_BOTTOM_RIGHT, RIGHT_BOUND_X,
-    //     0.5f, -0.5f, 0.5f, GRASS_BOTTOM_RIGHT, LEFT_BOUND_X,
-    //     0.5f, -0.5f, 0.5f, GRASS_BOTTOM_RIGHT, LEFT_BOUND_X,
-    //     -0.5f, -0.5f, 0.5f, GRASS_BOTTOM_LEFT, LEFT_BOUND_X,
-    //     -0.5f, -0.5f, -0.5f, GRASS_BOTTOM_LEFT, RIGHT_BOUND_X,
-    //     // top
-    //     -0.5f, 0.5f, -0.5f, GRASS_TOP_LEFT, RIGHT_BOUND_X,
-    //     0.5f, 0.5f, -0.5f, GRASS_TOP_RIGHT, RIGHT_BOUND_X,
-    //     0.5f, 0.5f, 0.5f, GRASS_TOP_RIGHT, LEFT_BOUND_X,
-    //     0.5f, 0.5f, 0.5f, GRASS_TOP_RIGHT, LEFT_BOUND_X,
-    //     -0.5f, 0.5f, 0.5f, GRASS_TOP_LEFT, LEFT_BOUND_X,
-    //     -0.5f, 0.5f, -0.5f, GRASS_TOP_LEFT, RIGHT_BOUND_X};
+        -0.5f, 0.5f, -0.5f, TOP_LEFT, 1.0f,
+        0.5f, 0.5f, -0.5f, TOP_RIGHT, 1.0f,
+        0.5f, 0.5f, 0.5f, TOP_RIGHT, 0.0f,
+        0.5f, 0.5f, 0.5f, TOP_RIGHT, 0.0f,
+        -0.5f, 0.5f, 0.5f, TOP_LEFT, 0.0f,
+        -0.5f, 0.5f, -0.5f, TOP_LEFT, 1.0f};
     int index = 0;
     switch (direction)
     {
