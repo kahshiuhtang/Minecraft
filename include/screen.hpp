@@ -19,6 +19,8 @@ namespace MCRFT
         int setupinputcallbacks();
 
         GLFWwindow *m_window;
+        unsigned int getscreenwidth(){ return SCR_WIDTH; }
+        unsigned int getscreenheight(){ return SCR_HEIGHT; }
 
     private:
     };

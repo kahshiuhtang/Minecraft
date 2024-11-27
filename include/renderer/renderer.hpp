@@ -38,6 +38,8 @@ namespace MCRFT
         TextureManager *m_texture_manager;
         unsigned int p_VBO;
         unsigned int p_VAO;
+        unsigned int norm_shader;
+        unsigned int crosshair_shader;
         // load and create a texture
         // -------------------------
         GLuint m_crosshairTextureID;

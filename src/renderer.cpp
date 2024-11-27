@@ -19,8 +19,9 @@ MCRFT::Renderer::Renderer()
 }
 int MCRFT::Renderer::setupshaders()
 {
-    unsigned int shaderid = m_shader_mang.addshader("../rsrc/7.3.camera.vs", "../rsrc/7.3.camera.fs");
-    m_curr_shader = m_shader_mang.getshader(shaderid);
+    norm_shader = m_shader_mang.addshader("../rsrc/7.3.camera.vs", "../rsrc/7.3.camera.fs");
+    m_curr_shader = m_shader_mang.getshader(norm_shader);
+    crosshair_shader = m_shader_mang.addshader("../rsrc/line.vs", "../rsrc/line.fs");
     // m_curr_shader = new Shader("../rsrc/model_loading.vs", "../rsrc/model_loading.fs");
     return 0;
 }
@@ -35,13 +36,48 @@ int MCRFT::Renderer::rendercrosshair()
     int error = 0;
     try
     {
+        glDisable(GL_DEPTH_TEST);
+        glUseProgram(crosshair_shader);
+
+        float halfcrosshairwidth = 30.0f / 2.0f;
+        float xsize = halfcrosshairwidth / m_screen->getscreenwidth() * 2.0f; // Convert to NDC
+        float ysize = halfcrosshairwidth / m_screen->getscreenheight() * 2.0f; // Convert to NDC
+        float crosshair[] = {
+            -xsize, 0.0f,  // Horizontal line
+             xsize, 0.0f,
+             0.0f, -ysize, // Vertical line
+             0.0f,  ysize
+        };
+
+        GLuint vao_2d, vbo_2d;
+        glGenVertexArrays(1, &vao_2d);
+        glGenBuffers(1, &vbo_2d);
+
+        glBindVertexArray(vao_2d);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_2d);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(crosshair), crosshair, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(0);
+
+        glBindVertexArray(vao_2d);
+        glDrawArrays(GL_LINES, 0, 4);
+        glBindVertexArray(0);
+
+        glDeleteVertexArrays(1, &vao_2d);
+        glDeleteBuffers(1, &vbo_2d);
+
+        glEnable(GL_DEPTH_TEST);
     }
     catch (const std::exception &e)
     {
         std::cout << "Renderer rendercrosshair(): Exception: " << e.what() << std::endl;
+        error = -1;
     }
     return error;
 }
+
 int MCRFT::Renderer::rendermapmeshes()
 {
     int error = 0;
@@ -82,7 +118,6 @@ int MCRFT::Renderer::rendermapmeshes()
     }
     return error;
 }
-
 int MCRFT::Renderer::loop()
 {
     // render loop
@@ -129,6 +164,7 @@ int MCRFT::Renderer::loop()
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         m_gui->startnewframe();
 
         // bind textures on corresponding texture units
@@ -153,6 +189,9 @@ int MCRFT::Renderer::loop()
         {
             m_gui->renderframe(fps_string);
         }
+        glEnable(GL_DEPTH_TEST);
+        glUseProgram(crosshair_shader);
+        this->rendercrosshair();
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(m_screen->m_window);
