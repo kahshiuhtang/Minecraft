@@ -1,0 +1,10 @@
+grass,1,3,1.0,2.0,3.0
+stone,2,1,4.0
+cobblestone,3,1,5.0
+oakwood,4,3,7.0,6.0,7.0
+oakleaves,5,3,9.0,8.0,9.0
+sand,6,1,10.0
+cactus,7,1,11.0
+oakplank,8,1,14.0
+brick,9,1,17.0
+stonebrick,10,1,18.0

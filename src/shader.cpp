@@ -18,11 +18,11 @@ std::string get_file_contents(const char *filename)
 }
 
 // Constructor that build the Shader Program from 2 different shaders
-MCRFT::Shader::Shader(const char *vertexFile, const char *fragmentFile)
+MCRFT::Shader::Shader(const char *vertexpath, const char *fragmentpath)
 {
 	// Read vertexFile and fragmentFile and store the strings
-	std::string vertexCode = get_file_contents(vertexFile);
-	std::string fragmentCode = get_file_contents(fragmentFile);
+	std::string vertexCode = get_file_contents(vertexpath);
+	std::string fragmentCode = get_file_contents(fragmentpath);
 
 	// Convert the shader source strings into character arrays
 	const char *vertexSource = vertexCode.c_str();

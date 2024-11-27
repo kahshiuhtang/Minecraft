@@ -10,6 +10,7 @@
 #include "PerlinNoise.hpp"
 
 #include "camera.hpp"
+#include "world/block.hpp"
 
 #define CHUNK_WIDTH         16
 #define CHUNK_LENGTH        16
@@ -30,12 +31,6 @@ namespace MCRFT
         BACK
     };
 
-    struct Block
-    {
-        uint8_t id;
-        uint8_t metadata;
-    };
-
     struct ChunkSection
     {
         std::vector<std::vector<std::vector<std::shared_ptr<Block>>>> blocks;
@@ -47,7 +42,6 @@ namespace MCRFT
               blockLight(CHUNK_LENGTH, std::vector<std::vector<uint8_t>>(CHUNK_WIDTH, std::vector<uint8_t>(CHUNK_HEIGHT))),
               skyLight(CHUNK_LENGTH, std::vector<std::vector<uint8_t>>(CHUNK_WIDTH, std::vector<uint8_t>(CHUNK_HEIGHT)))
         {
-            // Initialize all shared pointers to nullptr
             for (auto &plane : blocks)
                 for (auto &row : plane)
                     std::fill(row.begin(), row.end(), nullptr);
@@ -84,14 +78,15 @@ namespace MCRFT
         void createnew();
         bool isblockoccupied(int x, int y, int z);
         bool generateallchunkmeshes();
-        void castray(Camera *camera, glm::vec3 position);
+        void findhitblock(Camera *camera, glm::vec3 position);
         bool eraseblock(int x, int y, int z);
         bool isinsideblock(int x, int y, int z);
-        std::shared_ptr<MCRFT::Chunk> get_chunk(int x, int z);
+        std::shared_ptr<MCRFT::Chunk> getchunk(int x, int z);
 
         World()
             : m_chunks(CHUNK_LENGTH, std::vector<std::shared_ptr<Chunk>>(CHUNK_WIDTH))
         {
+            m_blockmanager.loadblocks("../rsrc/blocks.dat");
         }
 
     private:
@@ -99,6 +94,7 @@ namespace MCRFT
         const int CHUNK_SIZE_Y = 384;
         const int CHUNK_SIZE_Z = 16;
         std::vector<std::vector<std::shared_ptr<Chunk>>> m_chunks;
+        MCRFT::BlockManager m_blockmanager;
     };
 };
 

@@ -53,7 +53,7 @@ int MCRFT::Renderer::rendermapmeshes()
             {
 
                 glBindVertexArray(p_VAO);
-                std::shared_ptr<MCRFT::Chunk> chunk = m_world->get_chunk(i, j);
+                std::shared_ptr<MCRFT::Chunk> chunk = m_world->getchunk(i, j);
                 if (chunk == nullptr)
                 {
                     continue;
@@ -144,7 +144,7 @@ int MCRFT::Renderer::loop()
         m_camera->updateprojmatrix(m_curr_shader);
         if (glfwGetMouseButton(m_screen->m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         {
-            this->m_world->castray(m_camera, m_camera->m_curr_player->m_current_pos);
+            this->m_world->findhitblock(m_camera, m_camera->m_curr_player->m_current_pos);
         }
 
         // render boxes

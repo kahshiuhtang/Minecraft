@@ -68,6 +68,7 @@ add_executable(minecraft
                 src/gui.cpp
                 src/model.cpp 
                 src/mesh.cpp
+                src/block.cpp
                 include/camera.hpp
                 include/renderer/renderer.hpp
                 include/screen.hpp

@@ -208,10 +208,6 @@ void MCRFT::Chunk::generatesurfacemesh(MCRFT::World *world)
 }
 void addblockface(std::vector<float> *vertices, int x, int y, int z, MCRFT::Direction direction)
 {
-    float sides_left_x = (0.0 * 16.0) / 256.0;
-    float sides_right_x = (1.0 * 16.0) / 256.0;
-    float sides_top_y = (3.0 * 16.0) / 256.0;
-    float sides_bottom_y = (2.0 * 16.0) / 256.0;
     const float GRASS_SIDE_LEFT = (2.0 * 64.0) / 3048.0;
     const float GRASS_SIDE_RIGHT = (3.0 * 64.0) / 3048.0;
     const float GRASS_TOP_LEFT = (0.0 * 64.0) / 3048.0;
@@ -261,6 +257,57 @@ void addblockface(std::vector<float> *vertices, int x, int y, int z, MCRFT::Dire
         0.5f, 0.5f, 0.5f, GRASS_TOP_RIGHT, 0.0f,
         -0.5f, 0.5f, 0.5f, GRASS_TOP_LEFT, 0.0f,
         -0.5f, 0.5f, -0.5f, GRASS_TOP_LEFT, 1.0f};
+    // const float GRASS_SIDE_LEFT = (4.0 * 64.0) / 3048.0;
+    // const float GRASS_SIDE_RIGHT = (5.0 * 64.0) / 3048.0;
+    // const float GRASS_TOP_LEFT = (4.0 * 64.0) / 3048.0;
+    // const float GRASS_TOP_RIGHT = (5.0 * 64.0) / 3048.0;
+    // const float GRASS_BOTTOM_LEFT = (4.0 * 64.0) / 3048.0;
+    // const float GRASS_BOTTOM_RIGHT = (5.0 * 64.0) / 3048.0;
+    // const float RIGHT_BOUND_X = 1.0f;
+    // const float LEFT_BOUND_X = 0.0f;
+    // float VOXEL_VERTICES[] = {
+    //     // front
+    //     -0.5f, -0.5f, -0.5f, GRASS_SIDE_RIGHT, RIGHT_BOUND_X,
+    //     0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, RIGHT_BOUND_X,
+    //     0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, LEFT_BOUND_X,
+    //     0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, LEFT_BOUND_X,
+    //     -0.5f, 0.5f, -0.5f, GRASS_SIDE_RIGHT, LEFT_BOUND_X,
+    //     -0.5f, -0.5f, -0.5f, GRASS_SIDE_RIGHT, RIGHT_BOUND_X,
+    //     // back
+    //     -0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, RIGHT_BOUND_X,
+    //     0.5f, -0.5f, 0.5f, GRASS_SIDE_LEFT, RIGHT_BOUND_X,
+    //     0.5f, 0.5f, 0.5f, GRASS_SIDE_LEFT, LEFT_BOUND_X,
+    //     0.5f, 0.5f, 0.5f, GRASS_SIDE_LEFT, LEFT_BOUND_X,
+    //     -0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, LEFT_BOUND_X,
+    //     -0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, RIGHT_BOUND_X,
+    //     // right
+    //     -0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, LEFT_BOUND_X,
+    //     -0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, LEFT_BOUND_X,
+    //     -0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, RIGHT_BOUND_X,
+    //     -0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, RIGHT_BOUND_X,
+    //     -0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, RIGHT_BOUND_X,
+    //     -0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, LEFT_BOUND_X,
+    //     // left
+    //     0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, LEFT_BOUND_X,
+    //     0.5f, 0.5f, -0.5f, GRASS_SIDE_LEFT, LEFT_BOUND_X,
+    //     0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, RIGHT_BOUND_X,
+    //     0.5f, -0.5f, -0.5f, GRASS_SIDE_LEFT, RIGHT_BOUND_X,
+    //     0.5f, -0.5f, 0.5f, GRASS_SIDE_RIGHT, RIGHT_BOUND_X,
+    //     0.5f, 0.5f, 0.5f, GRASS_SIDE_RIGHT, LEFT_BOUND_X,
+    //     // bottom
+    //     -0.5f, -0.5f, -0.5f, GRASS_BOTTOM_LEFT, RIGHT_BOUND_X,
+    //     0.5f, -0.5f, -0.5f, GRASS_BOTTOM_RIGHT, RIGHT_BOUND_X,
+    //     0.5f, -0.5f, 0.5f, GRASS_BOTTOM_RIGHT, LEFT_BOUND_X,
+    //     0.5f, -0.5f, 0.5f, GRASS_BOTTOM_RIGHT, LEFT_BOUND_X,
+    //     -0.5f, -0.5f, 0.5f, GRASS_BOTTOM_LEFT, LEFT_BOUND_X,
+    //     -0.5f, -0.5f, -0.5f, GRASS_BOTTOM_LEFT, RIGHT_BOUND_X,
+    //     // top
+    //     -0.5f, 0.5f, -0.5f, GRASS_TOP_LEFT, RIGHT_BOUND_X,
+    //     0.5f, 0.5f, -0.5f, GRASS_TOP_RIGHT, RIGHT_BOUND_X,
+    //     0.5f, 0.5f, 0.5f, GRASS_TOP_RIGHT, LEFT_BOUND_X,
+    //     0.5f, 0.5f, 0.5f, GRASS_TOP_RIGHT, LEFT_BOUND_X,
+    //     -0.5f, 0.5f, 0.5f, GRASS_TOP_LEFT, LEFT_BOUND_X,
+    //     -0.5f, 0.5f, -0.5f, GRASS_TOP_LEFT, RIGHT_BOUND_X};
     int index = 0;
     switch (direction)
     {
@@ -306,7 +353,7 @@ bool MCRFT::World::isinsideblock(int x, int y, int z)
     res = res || this->isblockoccupied(x + 1, y + 1, z + 1);
     return res;
 }
-std::shared_ptr<MCRFT::Chunk> MCRFT::World::get_chunk(int x, int z)
+std::shared_ptr<MCRFT::Chunk> MCRFT::World::getchunk(int x, int z)
 {
     try
     {
@@ -354,7 +401,7 @@ bool MCRFT::World::eraseblock(int x, int y, int z)
     bool result = false;
     try
     {
-        std::shared_ptr<MCRFT::Chunk> curr_chunk = this->get_chunk(floor(x / CHUNK_LENGTH), floor(z / CHUNK_HEIGHT));
+        std::shared_ptr<MCRFT::Chunk> curr_chunk = this->getchunk(floor(x / CHUNK_LENGTH), floor(z / CHUNK_HEIGHT));
         if (curr_chunk == nullptr)
         {
             return result;
@@ -375,7 +422,7 @@ bool MCRFT::World::eraseblock(int x, int y, int z)
     }
     return result;
 }
-void MCRFT::World::castray(Camera *camera, glm::vec3 position)
+void MCRFT::World::findhitblock(Camera *camera, glm::vec3 position)
 {
     try
     {
@@ -399,6 +446,6 @@ void MCRFT::World::castray(Camera *camera, glm::vec3 position)
     }
     catch (const std::exception &e)
     {
-        std::cout << "Chunk castray(): Exception: " << e.what() << std::endl;
+        std::cout << "Chunk findhitblock(): Exception: " << e.what() << std::endl;
     }
 }

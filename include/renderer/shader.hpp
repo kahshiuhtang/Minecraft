@@ -17,7 +17,7 @@ namespace MCRFT
 	{
 	public:
 		unsigned int id;
-		Shader(const char *vertexPath, const char *fragmentPath);
+		Shader(const char *vertexpath, const char *fragmentpath);
 		void use() const
 		{
 			glUseProgram(id);
